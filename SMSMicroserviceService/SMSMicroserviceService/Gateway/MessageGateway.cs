@@ -1,7 +1,6 @@
 ﻿using SMSMicroService.Entities.Models;
 using SMSMicroService.Gateway.Base;
 using SMSMicroService.Gateway.Interface;
-using SMSMicroService.Infrastructures;
 
 namespace SMSMicroService.Gateway
 {

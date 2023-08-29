@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 using AutoFixture;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SMSMicroService.Entities.Domains;
 using SMSMicroService.Entities.Models;
 using SMSMicroService.Factories;
+using SMSMicroService.Gateway;
 using SMSMicroService.Gateway.Interface;
 using SMSMicroService.Handlers;
 using SMSMicroService.Helpers.Interfaces;
+using SMSMicroService.Infrastructures;
+using SMSMicroService.Infrastructures.Enums;
 using SMSMicroService.Notifications;
 
 namespace SMSMicroService.Tests.Handlers
@@ -43,16 +41,14 @@ namespace SMSMicroService.Tests.Handlers
         }
 
         [Fact]
-        public async Task HandleWorksFine()
+        public async Task HandlerSavesEntityAndLogInfoWhenApiCallResponseIsNotOk()
         {
             // Arrange
             var message = _fixture.Create<MessageDomain>();
             var data = new SendSmsAndPublishNotification<MessageDomain>(message);
             var entity = message.ToModel();
             entity.Id = 1;
-            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK); /*_fixture.Build<HttpResponseMessage>()
-                .With(x => x.StatusCode , HttpStatusCode.OK)
-                .Create();*/
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.InternalServerError); 
 
             messageGateway
                 .Setup(x=>x.Add(It.IsAny<MessageModel>()))
@@ -64,8 +60,145 @@ namespace SMSMicroService.Tests.Handlers
             await _sut.Handle(data, It.IsAny<CancellationToken>());
 
             // Assert
+            messageGateway.Verify(x=>x.Update(entity),Times.Once);
             logger.Verify(x => x.Log(
                 LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+        }
+
+        [Fact]
+        public async Task HandlerSavesEntityAndLOgInfoWhenApiCallResponseIsOk()
+        {
+            // Arrange
+            var message = _fixture.Create<MessageDomain>();
+            var data = new SendSmsAndPublishNotification<MessageDomain>(message);
+            var entity = message.ToModel();
+            entity.Id = 1;
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK); 
+
+            messageGateway
+                .Setup(x=>x.Add(It.IsAny<MessageModel>()))
+                .ReturnsAsync(entity);
+            callApi.Setup(x => x.Post(It.IsAny<string>(), message))
+                .ReturnsAsync(httpResponse);
+
+            // Act
+            await _sut.Handle(data, It.IsAny<CancellationToken>());
+
+            // Assert
+            messageGateway.Verify(x => x.Update(entity), Times.Once);
+            logger.Verify(x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+        }
+
+        [Fact]
+        public async Task HandlerThrowsCriticalExceptionsWHenMessageThrowsCriticalException()
+        {
+            // Arrange
+            var message = _fixture.Create<MessageDomain>();
+            var data = new SendSmsAndPublishNotification<MessageDomain>(message);
+            var entity = message.ToModel();
+            entity.Id = 1;
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK);
+
+            messageGateway
+                .Setup(x=>x.Add(It.IsAny<MessageModel>()))
+                .ThrowsAsync(new CriticalException(It.IsAny<string>()));
+            callApi.Setup(x => x.Post(It.IsAny<string>(), message))
+                .ReturnsAsync(httpResponse);
+
+            // Act
+            async Task Act() => await _sut.Handle(data, It.IsAny<CancellationToken>());
+
+            // Assert
+            await Assert.ThrowsAnyAsync<CriticalException>(Act);
+        }
+
+        [Fact]
+        public async Task HandlerLogExceptionsWHenMessageThrowsException()
+        {
+            // Arrange
+            var message = _fixture.Create<MessageDomain>();
+            var data = new SendSmsAndPublishNotification<MessageDomain>(message);
+            var entity = message.ToModel();
+            entity.Id = 1;
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK); 
+
+            messageGateway
+                .Setup(x=>x.Add(It.IsAny<MessageModel>()))
+                .ThrowsAsync(new Exception(It.IsAny<string>()));
+
+            callApi.Setup(x => x.Post(It.IsAny<string>(), message))
+                .ReturnsAsync(httpResponse);
+
+            // Act
+            await _sut.Handle(data, It.IsAny<CancellationToken>());
+
+            // Assert
+            logger.Verify(x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+        }
+
+        [Fact]
+        public async Task HandlerCallEventPublisherWhenApiCallerReturnsResponseOk()
+        {
+            // Arrange
+            var message = _fixture.Create<MessageDomain>();
+            var data = new SendSmsAndPublishNotification<MessageDomain>(message);
+            var entity = message.ToModel();
+            entity.Id = 1;
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK); 
+
+            messageGateway
+                .Setup(x=>x.Add(It.IsAny<MessageModel>()))
+                .ReturnsAsync(entity);
+
+            callApi.Setup(x => x.Post(It.IsAny<string>(), message))
+                .ReturnsAsync(httpResponse);
+
+            // Act
+            await _sut.Handle(data, It.IsAny<CancellationToken>());
+
+            // Assert
+            eventBusGateway.Verify(x=>x.Publish("SmsSent"),Times.Once);
+        }
+
+        [Fact]
+        public async Task HandlerSendsMessageToDeadLetterAndLogErrorWhenApiCallerDoNotReturnsResponseOk()
+        {
+            // Arrange
+            var message = _fixture.Create<MessageDomain>();
+            var data = new SendSmsAndPublishNotification<MessageDomain>(message);
+            var entity = message.ToModel();
+            entity.Id = 1;
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.BadRequest); 
+
+            messageGateway
+                .Setup(x=>x.Add(It.IsAny<MessageModel>()))
+                .ReturnsAsync(entity);
+
+            callApi.Setup(x => x.Post(It.IsAny<string>(), message))
+                .ReturnsAsync(httpResponse);
+
+            // Act
+            await _sut.Handle(data, It.IsAny<CancellationToken>());
+
+            // Assert
+            eventBusGateway.Verify(x=>x.Publish("SmsSent"),Times.Never);
+            rabbitDeadLetterMessageQueueGateway.Verify(x=>x.EnQueue(message),Times.Once);
+            logger.Verify(x => x.Log(
+                LogLevel.Error,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => true),
                 It.IsAny<Exception>(),
