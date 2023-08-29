@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Infrastructures\Wrappers\**" />
+    <Compile Remove="Messenger\**" />
+    <Compile Remove="Notifications\Interfaces\**" />
+    <Content Remove="Infrastructures\Wrappers\**" />
+    <Content Remove="Messenger\**" />
+    <Content Remove="Notifications\Interfaces\**" />
+    <EmbeddedResource Remove="Infrastructures\Wrappers\**" />
+    <EmbeddedResource Remove="Messenger\**" />
+    <EmbeddedResource Remove="Notifications\Interfaces\**" />
+    <None Remove="Infrastructures\Wrappers\**" />
+    <None Remove="Messenger\**" />
+    <None Remove="Notifications\Interfaces\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="10.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.10" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+</Project>
