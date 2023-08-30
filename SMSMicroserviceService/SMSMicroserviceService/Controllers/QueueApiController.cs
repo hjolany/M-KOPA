@@ -13,7 +13,7 @@ namespace SMSMicroService.Controllers
     {
         private readonly IRabbitMainMessageQueueGateway<MessageDomain> _rabbitMainMessageQueueGateway;
         private readonly IMessageGateway _messageGateway;
-         
+
         public QueueApiController(IRabbitMainMessageQueueGateway<MessageDomain> rabbitMainMessageQueueGateway,
             IMessageGateway messageGateway)
         {
@@ -40,9 +40,11 @@ namespace SMSMicroService.Controllers
         }
 
         [HttpGet("count/success")]
-        public async Task<IActionResult> GetSuccessCount()
+        public async Task<IActionResult> GetSuccessCount([FromQuery] ESuccessTime successTime = ESuccessTime.First)
         {
-            var data = await _messageGateway.GetAll(p => p.Status == EStatus.Success);
+            var data = await _messageGateway.GetAll(p => 
+                p.RetryCount == (successTime == ESuccessTime.First ? 1 : (successTime == ESuccessTime.Second ? 2 : p.RetryCount)) &&
+                p.Status == EStatus.Success);
             return Ok(data.Count());
         }
 
@@ -54,9 +56,12 @@ namespace SMSMicroService.Controllers
         }
 
         [HttpGet("success")]
-        public async Task<IActionResult> GetSuccess()
+        public async Task<IActionResult> GetSuccess([FromQuery] ESuccessTime successTime = ESuccessTime.First)
         {
-            var data = await _messageGateway.GetAll(p => p.Status == EStatus.Success);
+            var data = await _messageGateway.GetAll(p =>
+
+                p.RetryCount == (successTime == ESuccessTime.First ? 1 : (successTime == ESuccessTime.Second ? 2 : p.RetryCount)) &&
+                p.Status == EStatus.Success);
             return Ok(data.ToList());
         }
 

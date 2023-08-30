@@ -10,7 +10,6 @@ namespace SMSMicroService.Services
         private readonly ISendSmsFromQueueAndPublishEventUseCase _sendSmsFromQueueAndPublishEventUseCase;
         private readonly IMediator _mediator;
         private readonly ILogger<MainQueueService> _logger;
-        private Timer _timer;
 
         public MainQueueService(ISendSmsFromQueueAndPublishEventUseCase sendSmsFromQueueAndPublishEventUseCase
         , IMediator mediator
@@ -22,12 +21,6 @@ namespace SMSMicroService.Services
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            /*_timer = new Timer(RunService(stoppingToken), null, TimeSpan.Zero, TimeSpan.FromSeconds(2));*/
-            _timer = new Timer(RunService, null, TimeSpan.Zero, TimeSpan.FromSeconds(2));
-        }
-
-        private async Task RunService(CancellationToken stoppingToken)
         {
             try
             {
