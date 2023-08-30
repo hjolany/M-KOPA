@@ -9,5 +9,6 @@ namespace SMSMicroService.Gateway.Interface
         public abstract Task EnQueue(T message);
         public abstract Task DeQueue();
         public abstract Task<int> ConsumerCount();
+        public abstract Task DeleteQueue();
     }
 }

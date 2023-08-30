@@ -41,7 +41,7 @@ namespace SMSMicroService.Gateway.Base
             if (!_connection.IsOpen)
                 throw new ConnectionAbortedException($"{nameof(BaseRabbitMessageQueueGateway<T>)}." +
                                                      $"{nameof(BaseRabbitMessageQueueGateway<T>.DeQueue)}: " +
-                                                     $"Connection is closed to message queue");
+                                                     $"The connection to the message queue is closed.");
 
             var consumer = new EventingBasicConsumer(Channel);
             consumer.Received += async (sender, e) =>
@@ -75,11 +75,23 @@ namespace SMSMicroService.Gateway.Base
             if (!_connection.IsOpen)
                 throw new ConnectionAbortedException($"{nameof(BaseRabbitMessageQueueGateway<T>)}." +
                                                      $"{nameof(BaseRabbitMessageQueueGateway<T>.EnQueue)}: " +
-                                                     $"Connection is closed to message queue");
+                                                     $"The connection to the message queue is closed.");
 
             /*var queueDeclareResponse = Channel.QueueDeclarePassive(_queueName);
             return (int)queueDeclareResponse.MessageCount+(int)queueDeclareResponse.;*/
             return (int)Channel.ConsumerCount(_queueName);
+        }
+
+        public async Task DeleteQueue()
+        {
+            if (!_connection.IsOpen)
+                throw new ConnectionAbortedException($"{nameof(BaseRabbitMessageQueueGateway<T>)}." +
+                                                     $"{nameof(BaseRabbitMessageQueueGateway<T>.EnQueue)}: " +
+                                                     $"The connection to the message queue is closed.");
+
+            /*var queueDeclareResponse = Channel.QueueDeclarePassive(_queueName);
+            return (int)queueDeclareResponse.MessageCount+(int)queueDeclareResponse.;*/
+            Channel.QueueDelete(_queueName, true, true);
         }
 
         public virtual async Task EnQueue(T message)
@@ -87,7 +99,7 @@ namespace SMSMicroService.Gateway.Base
             if (!_connection.IsOpen)
                 throw new ConnectionAbortedException($"{nameof(BaseRabbitMessageQueueGateway<T>)}." +
                                                      $"{nameof(BaseRabbitMessageQueueGateway<T>.EnQueue)}: " +
-                                                     $"Connection is closed to message queue");
+                                                     $"The connection to the message queue is closed.");
             
             var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
             Channel.BasicPublish("", _queueName, null, body);
