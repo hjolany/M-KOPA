@@ -45,7 +45,7 @@ namespace SMSMicroService.Handlers
                 {
                     entity.Status = EStatus.Failed;
                     entity.Exception = await response?.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"External API Error: {entity.Exception}");
+                    _logger.LogError($"External API Error: {entity.Exception}");
                 }
                 await _messageGateway.Update(entity).ConfigureAwait(false);
                 _logger.LogInformation($"{DateTime.Now:HH:mm:ss}\t{notification.Data}");

@@ -4,6 +4,6 @@ namespace SMSMicroService.Helpers.Interfaces
 {
     public interface IEmailHelper
     {
-        public Task Send(EmailDomain model);
+        public Task<bool> Send(EmailDomain model);
     }
 }

@@ -42,11 +42,5 @@ namespace SMSMicroService.Tests.Test.Helpers
             var fillMq = new SMSMicroService.Controllers.SmsServiceApiController(mainGateway, new MessageGateway());
             fillMq.Send(_fixture.Create<MessageDomain>());
         }
-
-        /*public void FillDeadQueue()
-        {
-            var fillMq = new SMSMicroService.Controllers.SmsServiceApiController(mainGateway, new MessageGateway());
-            fillMq.Send(_fixture.Create<MessageDomain>());
-        }*/
     }
 }

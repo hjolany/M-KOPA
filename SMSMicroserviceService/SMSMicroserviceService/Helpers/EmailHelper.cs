@@ -1,13 +1,13 @@
 ﻿using System.Net.Mail;
 using System.Text;
 using SMSMicroService.Entities.Domains;
-using Exception = System.Exception;
+using SMSMicroService.Helpers.Interfaces; 
 
 namespace SMSMicroService.Helpers
 {
-    public abstract class EmailHelper
+    public abstract class EmailHelper: IEmailHelper
     {
-        public static bool Send(EmailDomain model)
+        public async Task<bool> Send(EmailDomain model)
         {
             var mail = new MailMessage();
             mail.BodyEncoding = Encoding.UTF8;

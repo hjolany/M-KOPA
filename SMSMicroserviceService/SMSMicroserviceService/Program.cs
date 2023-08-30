@@ -12,9 +12,7 @@ using SMSMicroService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -22,6 +20,7 @@ builder.Services.AddLogging(l =>
 {
     l.AddConsole();
 });
+
 builder.Services.AddMediatR(typeof(Program));
 
 builder.Services.AddHttpClient("CallApiHttpClient", c =>
@@ -29,6 +28,7 @@ builder.Services.AddHttpClient("CallApiHttpClient", c =>
     c.Timeout = TimeSpan.FromSeconds(int.Parse(AppConfig.Get("ExternalAPi:Timeout")));
 });
 
+builder.Services.AddSingleton<IEmailHelper, EmailHelper>();
 builder.Services.AddSingleton<ICallApi<MessageDomain>, CallApi<MessageDomain>>();
 builder.Services.AddSingleton<IMessageGateway, MessageGateway>();
 builder.Services.AddSingleton<ISendSmsFromQueueAndPublishEventUseCase, SendSmsFromQueueAndPublishEventUseCase>();
