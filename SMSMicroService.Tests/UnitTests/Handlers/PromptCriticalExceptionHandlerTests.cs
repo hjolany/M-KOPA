@@ -4,22 +4,23 @@ using SMSMicroService.Entities.Domains;
 using SMSMicroService.Handlers;
 using SMSMicroService.Helpers;
 using SMSMicroService.Helpers.Interfaces;
+using SMSMicroService.Infrastructures;
 using SMSMicroService.Infrastructures.Extensions;
 using SMSMicroService.Notifications;
 
-namespace SMSMicroService.Tests.Handlers
+namespace SMSMicroService.Tests.UnitTests.Handlers
 {
-    public class PromptExceptionHandlerTests
+    public class PromptCriticalExceptionHandlerTests
     {
-        private readonly PromptExceptionHandler _sut;
-        private readonly Mock<ILogger<PromptExceptionHandler>> _logger;
+        private readonly PromptCriticalExceptionHandler _sut;
+        private readonly Mock<ILogger<PromptCriticalExceptionHandler>> _logger;
         private readonly Mock<IEmailHelper> _emailHelper;
 
-        public PromptExceptionHandlerTests()
+        public PromptCriticalExceptionHandlerTests()
         {
             _emailHelper = new Mock<IEmailHelper>();
-            _logger = new Mock<ILogger<PromptExceptionHandler>>();
-            _sut = new PromptExceptionHandler(_logger.Object, _emailHelper.Object);
+            _logger = new Mock<ILogger<PromptCriticalExceptionHandler>>();
+            _sut = new PromptCriticalExceptionHandler(_logger.Object, _emailHelper.Object);
         }
 
         [Fact]
@@ -27,8 +28,8 @@ namespace SMSMicroService.Tests.Handlers
         {
             // Arrange
             var recipient = AppConfig.Get("Recipients:Admin").ToString();
-            var exception = new Exception("Sample Exception");
-            var notification = new PromptNotification<Exception>(exception);
+            var exception = new CriticalException("Sample Exception");
+            var notification = new PromptNotification<CriticalException>(exception);
             _emailHelper.Setup(x => x.Send(It.IsAny<EmailDomain>()))
                 .ReturnsAsync(true);
 
@@ -50,9 +51,9 @@ namespace SMSMicroService.Tests.Handlers
         {
             // Arrange
             var recipient = AppConfig.Get("Recipients:Admin").ToString();
-            var exception = new Exception("Sample Exception");
+            var exception = new CriticalException("Sample Exception");
             var emailHelperException = new Exception("Internal Exception");
-            var notification = new PromptNotification<Exception>(exception);
+            var notification = new PromptNotification<CriticalException>(exception);
             _emailHelper.Setup(x => x.Send(It.IsAny<EmailDomain>()))
                 .ThrowsAsync(emailHelperException);
 

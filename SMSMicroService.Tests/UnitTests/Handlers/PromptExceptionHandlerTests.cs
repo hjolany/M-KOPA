@@ -4,21 +4,22 @@ using SMSMicroService.Entities.Domains;
 using SMSMicroService.Handlers;
 using SMSMicroService.Helpers;
 using SMSMicroService.Helpers.Interfaces;
+using SMSMicroService.Infrastructures.Extensions;
 using SMSMicroService.Notifications;
 
-namespace SMSMicroService.Tests.Handlers
+namespace SMSMicroService.Tests.UnitTests.Handlers
 {
-    public class PromptStringHandlerTests
+    public class PromptExceptionHandlerTests
     {
-        private readonly PromptStringHandler _sut;
-        private readonly Mock<ILogger<PromptStringHandler>> _logger;
+        private readonly PromptExceptionHandler _sut;
+        private readonly Mock<ILogger<PromptExceptionHandler>> _logger;
         private readonly Mock<IEmailHelper> _emailHelper;
 
-        public PromptStringHandlerTests()
+        public PromptExceptionHandlerTests()
         {
             _emailHelper = new Mock<IEmailHelper>();
-            _logger = new Mock<ILogger<PromptStringHandler>>();
-            _sut = new PromptStringHandler(_logger.Object, _emailHelper.Object);
+            _logger = new Mock<ILogger<PromptExceptionHandler>>();
+            _sut = new PromptExceptionHandler(_logger.Object, _emailHelper.Object);
         }
 
         [Fact]
@@ -26,8 +27,8 @@ namespace SMSMicroService.Tests.Handlers
         {
             // Arrange
             var recipient = AppConfig.Get("Recipients:Admin").ToString();
-            var sampleMessage = "Sample Message";
-            var notification = new PromptNotification<string>(sampleMessage);
+            var exception = new Exception("Sample Exception");
+            var notification = new PromptNotification<Exception>(exception);
             _emailHelper.Setup(x => x.Send(It.IsAny<EmailDomain>()))
                 .ReturnsAsync(true);
 
@@ -40,7 +41,7 @@ namespace SMSMicroService.Tests.Handlers
                     It.Is<EmailDomain>(email =>
                         email.Subject == "Prompt" &&
                         email.Email.Contains(recipient) &&
-                        email.Body.Contains(sampleMessage))),
+                        email.Body.Contains(exception.GetFullMessage()))),
                 Times.Once);
         }
 
@@ -49,9 +50,9 @@ namespace SMSMicroService.Tests.Handlers
         {
             // Arrange
             var recipient = AppConfig.Get("Recipients:Admin").ToString();
-            var sampleMessage = "Sample Message";
+            var exception = new Exception("Sample Exception");
             var emailHelperException = new Exception("Internal Exception");
-            var notification = new PromptNotification<string>(sampleMessage);
+            var notification = new PromptNotification<Exception>(exception);
             _emailHelper.Setup(x => x.Send(It.IsAny<EmailDomain>()))
                 .ThrowsAsync(emailHelperException);
 
@@ -64,7 +65,7 @@ namespace SMSMicroService.Tests.Handlers
                     It.Is<EmailDomain>(email =>
                         email.Subject == "Prompt" &&
                         email.Email.Contains(recipient) &&
-                        email.Body.Contains(sampleMessage))),
+                        email.Body.Contains(exception.GetFullMessage()))),
                 Times.Once);
 
             _logger.Verify(x => x.Log(

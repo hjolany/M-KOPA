@@ -4,7 +4,7 @@ using SMSMicroService.Gateway.Interface;
 using SMSMicroService.UseCases;
 using SMSMicroService.UseCases.Interfaces;
 
-namespace SMSMicroService.Tests.UseCases
+namespace SMSMicroService.Tests.UnitTests.UseCases
 {
     public class ReSendSmsFromQueueAndPublishEventUseCaseTests
     {
@@ -15,7 +15,7 @@ namespace SMSMicroService.Tests.UseCases
 
         public ReSendSmsFromQueueAndPublishEventUseCaseTests()
         {
-            _gateway=new Mock<IRabbitDeadLetterMessageQueueGateway<MessageDomain>>();
+            _gateway = new Mock<IRabbitDeadLetterMessageQueueGateway<MessageDomain>>();
             _sut = new ReSendSmsFromQueueAndPublishEventUseCase(_gateway.Object);
         }
 

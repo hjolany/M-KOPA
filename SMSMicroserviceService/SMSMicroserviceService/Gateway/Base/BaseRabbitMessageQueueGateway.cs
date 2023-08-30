@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Threading.Channels;
 using MediatR;
 using Microsoft.AspNetCore.Connections;
 using Newtonsoft.Json;
@@ -67,6 +68,18 @@ namespace SMSMicroService.Gateway.Base
                 }
             };
             Channel.BasicConsume(queue: _queueName, consumer: consumer, autoAck: false);
+        }
+
+        public async Task<int> ConsumerCount()
+        {
+            if (!_connection.IsOpen)
+                throw new ConnectionAbortedException($"{nameof(BaseRabbitMessageQueueGateway<T>)}." +
+                                                     $"{nameof(BaseRabbitMessageQueueGateway<T>.EnQueue)}: " +
+                                                     $"Connection is closed to message queue");
+
+            /*var queueDeclareResponse = Channel.QueueDeclarePassive(_queueName);
+            return (int)queueDeclareResponse.MessageCount+(int)queueDeclareResponse.;*/
+            return (int)Channel.ConsumerCount(_queueName);
         }
 
         public virtual async Task EnQueue(T message)

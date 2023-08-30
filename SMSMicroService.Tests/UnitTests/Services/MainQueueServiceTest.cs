@@ -6,10 +6,10 @@ using SMSMicroService.Notifications;
 using SMSMicroService.Services;
 using SMSMicroService.UseCases.Interfaces;
 
-namespace SMSMicroService.Tests.Services
+namespace SMSMicroService.Tests.UnitTests.Services
 {
 
-    public class MainQueueServiceTest    
+    public class MainQueueServiceTest
     {
         private readonly Mock<ISendSmsFromQueueAndPublishEventUseCase> _sendSmsFromQueueAndPublishEventUseCase;
         private readonly Mock<IMediator> _mediator;
@@ -33,7 +33,7 @@ namespace SMSMicroService.Tests.Services
             _sut.StartAsync(CancellationToken.None);
 
             // Assert
-            _sendSmsFromQueueAndPublishEventUseCase.Verify(x=>x.ExecuteAsync(),Times.Once);
+            _sendSmsFromQueueAndPublishEventUseCase.Verify(x => x.ExecuteAsync(), Times.Once);
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace SMSMicroService.Tests.Services
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
 
-            _mediator.Verify(x=> x.Publish(It.IsAny<PromptNotification<Exception>>(), It.IsAny<CancellationToken>()),Times.Once);
+            _mediator.Verify(x => x.Publish(It.IsAny<PromptNotification<Exception>>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

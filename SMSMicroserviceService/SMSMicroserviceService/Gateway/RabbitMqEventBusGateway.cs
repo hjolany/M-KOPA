@@ -24,6 +24,7 @@ namespace SMSMicroService.Gateway
             _channel = connection.CreateModel();
             _channel.ExchangeDeclare(exchange: _exchangeName, type: ExchangeType.Topic);
         }
+
         public async Task Publish(T data)
         {
             try
@@ -39,6 +40,14 @@ namespace SMSMicroService.Gateway
             {
                 throw new CriticalException(ex.GetFullMessage());
             }
+        }
+
+        public async Task Count()
+        {
+            if (!_connection.IsOpen)
+                throw new ConnectionAbortedException();
+
+            //_channel.ExchangeBind();
         }
     }
 }

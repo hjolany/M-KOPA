@@ -1,19 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SMSMicroService.Entities.Domains;
 using SMSMicroService.Gateway.Interface;
+using SMSMicroService.Helpers;
 using SMSMicroService.Infrastructures.Enums;
 
 namespace SMSMicroService.Controllers
 {
     [ApiController]
-    [Route("api/v1/sms")]
+    [Route("api/v1/queue/")]
     [Produces("application/json")]
-    public class SmsServiceApiController : ControllerBase
+    public class QueueApiController : ControllerBase
     {
         private readonly IRabbitMainMessageQueueGateway<MessageDomain> _rabbitMainMessageQueueGateway;
         private readonly IMessageGateway _messageGateway;
          
-        public SmsServiceApiController(IRabbitMainMessageQueueGateway<MessageDomain> rabbitMainMessageQueueGateway,
+        public QueueApiController(IRabbitMainMessageQueueGateway<MessageDomain> rabbitMainMessageQueueGateway,
             IMessageGateway messageGateway)
         {
             _rabbitMainMessageQueueGateway = rabbitMainMessageQueueGateway;
@@ -21,10 +22,10 @@ namespace SMSMicroService.Controllers
         }
 
 
-        [HttpPost("queue/send")]
+        [HttpPost("send")]
         public IActionResult Send(MessageDomain domain)
         {
-            for (int i = 0; i < 5000; i++)
+            for (int i = 0; i < int.Parse(AppConfig.Get("Dummy:Count")); i++)
             {
                 _rabbitMainMessageQueueGateway.EnQueue(domain);
             }
@@ -64,6 +65,13 @@ namespace SMSMicroService.Controllers
         {
             var data = await _messageGateway.GetAll(p => p.Status == EStatus.Failed);
             return Ok(data.ToList());
+        }
+
+        [HttpGet("consumer/count")]
+        public async Task<IActionResult> GetCount()
+        {
+            var cnt = await _rabbitMainMessageQueueGateway.ConsumerCount().ConfigureAwait(false);
+            return Ok(cnt);
         }
     }
 }

@@ -7,7 +7,7 @@ using SMSMicroService.Entities.Domains;
 using SMSMicroService.Gateway;
 using SMSMicroService.Helpers;
 
-namespace SMSMicroService.Tests.Test.Helpers
+namespace SMSMicroService.Tests.Utilities
 {
     public class FillMessageQueue
     {
@@ -39,7 +39,7 @@ namespace SMSMicroService.Tests.Test.Helpers
 
         public void FillMainQueue()
         {
-            var fillMq = new SMSMicroService.Controllers.SmsServiceApiController(mainGateway, new MessageGateway());
+            var fillMq = new SMSMicroService.Controllers.QueueApiController(mainGateway, new MessageGateway());
             fillMq.Send(_fixture.Create<MessageDomain>());
         }
     }

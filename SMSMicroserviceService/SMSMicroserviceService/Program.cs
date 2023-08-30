@@ -9,6 +9,7 @@ using RabbitMQ.Client;
 using SMSMicroService.Helpers;
 using SMSMicroService.Helpers.Interfaces;
 using SMSMicroService.Services;
+using SMSMicroService.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,8 @@ builder.Services.AddHttpClient("CallApiHttpClient", c =>
 {
     c.Timeout = TimeSpan.FromSeconds(int.Parse(AppConfig.Get("ExternalAPi:Timeout")));
 });
+
+builder.Services.AddSingleton<QueueApiController, QueueApiController>();
 
 builder.Services.AddSingleton<IEmailHelper, EmailHelper>();
 builder.Services.AddSingleton<ICallApi<MessageDomain>, CallApi<MessageDomain>>();
@@ -78,10 +81,12 @@ builder.Services.AddSingleton<IEventBusGateway<string>>(provider =>
 builder.Services.AddHostedService<MainQueueService>();
 builder.Services.AddHostedService<DeadQueueService>();
 
- 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
- 
+app.UseRouting();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -96,4 +101,15 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGet("/", async context =>
+    {
+        await context.Response.WriteAsync("I'm Ok, don't worry....");
+    }); 
+    endpoints.MapHealthChecks("/health");
+});
+
 app.Run();
+
+public partial class Program { }

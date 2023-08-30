@@ -5,7 +5,7 @@ using SMSMicroService.Helpers.Interfaces;
 
 namespace SMSMicroService.Helpers
 {
-    public abstract class EmailHelper: IEmailHelper
+    public class EmailHelper: IEmailHelper
     {
         public async Task<bool> Send(EmailDomain model)
         {

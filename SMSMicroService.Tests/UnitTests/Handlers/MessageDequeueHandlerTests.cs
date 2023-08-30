@@ -13,7 +13,7 @@ using SMSMicroService.Infrastructures;
 using SMSMicroService.Infrastructures.Enums;
 using SMSMicroService.Notifications;
 
-namespace SMSMicroService.Tests.Handlers
+namespace SMSMicroService.Tests.UnitTests.Handlers
 {
     public class MessageDequeueHandlerTests
     {
@@ -48,10 +48,10 @@ namespace SMSMicroService.Tests.Handlers
             var data = new SendSmsAndPublishNotification<MessageDomain>(message);
             var entity = message.ToModel();
             entity.Id = 1;
-            var httpResponse = new HttpResponseMessage(HttpStatusCode.InternalServerError); 
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.InternalServerError);
 
             messageGateway
-                .Setup(x=>x.Add(It.IsAny<MessageModel>()))
+                .Setup(x => x.Add(It.IsAny<MessageModel>()))
                 .ReturnsAsync(entity);
             callApi.Setup(x => x.Post(It.IsAny<string>(), message))
                 .ReturnsAsync(httpResponse);
@@ -60,7 +60,7 @@ namespace SMSMicroService.Tests.Handlers
             await _sut.Handle(data, It.IsAny<CancellationToken>());
 
             // Assert
-            messageGateway.Verify(x=>x.Update(entity),Times.Once);
+            messageGateway.Verify(x => x.Update(entity), Times.Once);
             logger.Verify(x => x.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
@@ -77,10 +77,10 @@ namespace SMSMicroService.Tests.Handlers
             var data = new SendSmsAndPublishNotification<MessageDomain>(message);
             var entity = message.ToModel();
             entity.Id = 1;
-            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK); 
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK);
 
             messageGateway
-                .Setup(x=>x.Add(It.IsAny<MessageModel>()))
+                .Setup(x => x.Add(It.IsAny<MessageModel>()))
                 .ReturnsAsync(entity);
             callApi.Setup(x => x.Post(It.IsAny<string>(), message))
                 .ReturnsAsync(httpResponse);
@@ -109,7 +109,7 @@ namespace SMSMicroService.Tests.Handlers
             var httpResponse = new HttpResponseMessage(HttpStatusCode.OK);
 
             messageGateway
-                .Setup(x=>x.Add(It.IsAny<MessageModel>()))
+                .Setup(x => x.Add(It.IsAny<MessageModel>()))
                 .ThrowsAsync(new CriticalException(It.IsAny<string>()));
             callApi.Setup(x => x.Post(It.IsAny<string>(), message))
                 .ReturnsAsync(httpResponse);
@@ -129,10 +129,10 @@ namespace SMSMicroService.Tests.Handlers
             var data = new SendSmsAndPublishNotification<MessageDomain>(message);
             var entity = message.ToModel();
             entity.Id = 1;
-            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK); 
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK);
 
             messageGateway
-                .Setup(x=>x.Add(It.IsAny<MessageModel>()))
+                .Setup(x => x.Add(It.IsAny<MessageModel>()))
                 .ThrowsAsync(new Exception(It.IsAny<string>()));
 
             callApi.Setup(x => x.Post(It.IsAny<string>(), message))
@@ -158,10 +158,10 @@ namespace SMSMicroService.Tests.Handlers
             var data = new SendSmsAndPublishNotification<MessageDomain>(message);
             var entity = message.ToModel();
             entity.Id = 1;
-            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK); 
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK);
 
             messageGateway
-                .Setup(x=>x.Add(It.IsAny<MessageModel>()))
+                .Setup(x => x.Add(It.IsAny<MessageModel>()))
                 .ReturnsAsync(entity);
 
             callApi.Setup(x => x.Post(It.IsAny<string>(), message))
@@ -171,7 +171,7 @@ namespace SMSMicroService.Tests.Handlers
             await _sut.Handle(data, It.IsAny<CancellationToken>());
 
             // Assert
-            eventBusGateway.Verify(x=>x.Publish("SmsSent"),Times.Once);
+            eventBusGateway.Verify(x => x.Publish("SmsSent"), Times.Once);
         }
 
         [Fact]
@@ -182,10 +182,10 @@ namespace SMSMicroService.Tests.Handlers
             var data = new SendSmsAndPublishNotification<MessageDomain>(message);
             var entity = message.ToModel();
             entity.Id = 1;
-            var httpResponse = new HttpResponseMessage(HttpStatusCode.BadRequest); 
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.BadRequest);
 
             messageGateway
-                .Setup(x=>x.Add(It.IsAny<MessageModel>()))
+                .Setup(x => x.Add(It.IsAny<MessageModel>()))
                 .ReturnsAsync(entity);
 
             callApi.Setup(x => x.Post(It.IsAny<string>(), message))
@@ -195,8 +195,8 @@ namespace SMSMicroService.Tests.Handlers
             await _sut.Handle(data, It.IsAny<CancellationToken>());
 
             // Assert
-            eventBusGateway.Verify(x=>x.Publish("SmsSent"),Times.Never);
-            rabbitDeadLetterMessageQueueGateway.Verify(x=>x.EnQueue(message),Times.Once);
+            eventBusGateway.Verify(x => x.Publish("SmsSent"), Times.Never);
+            rabbitDeadLetterMessageQueueGateway.Verify(x => x.EnQueue(message), Times.Once);
             logger.Verify(x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),

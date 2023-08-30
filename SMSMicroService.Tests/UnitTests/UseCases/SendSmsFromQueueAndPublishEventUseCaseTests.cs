@@ -4,7 +4,7 @@ using SMSMicroService.Gateway.Interface;
 using SMSMicroService.UseCases;
 using SMSMicroService.UseCases.Interfaces;
 
-namespace SMSMicroService.Tests.UseCases
+namespace SMSMicroService.Tests.UnitTests.UseCases
 {
     public class SendSmsFromQueueAndPublishEventUseCaseTests
     {
@@ -15,7 +15,7 @@ namespace SMSMicroService.Tests.UseCases
 
         public SendSmsFromQueueAndPublishEventUseCaseTests()
         {
-            _gateway=new Mock<IRabbitMainMessageQueueGateway<MessageDomain>>();
+            _gateway = new Mock<IRabbitMainMessageQueueGateway<MessageDomain>>();
             _sut = new SendSmsFromQueueAndPublishEventUseCase(_gateway.Object);
         }
 

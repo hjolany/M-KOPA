@@ -11,7 +11,7 @@ using SMSMicroService.Infrastructures;
 using SMSMicroService.Notifications;
 using System.Net;
 
-namespace SMSMicroService.Tests.Handlers
+namespace SMSMicroService.Tests.UnitTests.Handlers
 {
     public class DeadLetterDequeueHandlerTests
     {

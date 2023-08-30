@@ -8,5 +8,6 @@ namespace SMSMicroService.Gateway.Interface
         public abstract event EventHandler<RabbitMessageReceivedArgumentDomain<T>> OnMessage;
         public abstract Task EnQueue(T message);
         public abstract Task DeQueue();
+        public abstract Task<int> ConsumerCount();
     }
 }

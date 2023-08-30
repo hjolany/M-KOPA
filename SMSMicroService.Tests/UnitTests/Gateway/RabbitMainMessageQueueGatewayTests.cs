@@ -9,23 +9,23 @@ using SMSMicroService.Gateway;
 using SMSMicroService.Helpers;
 using SMSMicroService.Infrastructures;
 using SMSMicroService.Notifications;
-using SMSMicroService.Tests.Test.Helpers;
+using SMSMicroService.Tests.Utilities;
 using IConnectionFactory = RabbitMQ.Client.IConnectionFactory;
 
-namespace SMSMicroService.Tests.Gateway;
+namespace SMSMicroService.Tests.UnitTests.Gateway;
 
-public class RabbitDeadLetterMessageQueueGatewayTests
+public class RabbitMainMessageQueueGatewayTests
 {
-    
+
     private readonly Fixture _fixture;
     private readonly IConnection _connection;
     private readonly IConnectionFactory _factory;
-    private readonly RabbitDeadLetterMessageQueueGateway<MessageDomain> _sut;
+    private readonly RabbitMainMessageQueueGateway<MessageDomain> _sut;
     private readonly string _queueName = AppConfig.Get("Queue:Main");
-    private readonly Mock<ILogger<RabbitDeadLetterMessageQueueGateway<MessageDomain>>> _logger;
+    private readonly Mock<ILogger<RabbitMainMessageQueueGateway<MessageDomain>>> _logger;
     private readonly Mock<IMediator> _mediator;
     private readonly string uri;
-    public RabbitDeadLetterMessageQueueGatewayTests()
+    public RabbitMainMessageQueueGatewayTests()
     {
         uri = AppConfig.Get("Queue:Uri");
         _fixture = new Fixture();
@@ -35,9 +35,9 @@ public class RabbitDeadLetterMessageQueueGatewayTests
         };
         _connection = _factory.CreateConnection();
         /*var channel = _connection.CreateModel();*/
-        _logger = new Mock<ILogger<RabbitDeadLetterMessageQueueGateway<MessageDomain>>>();
+        _logger = new Mock<ILogger<RabbitMainMessageQueueGateway<MessageDomain>>>();
         _mediator = new Mock<IMediator>();
-        _sut = new RabbitDeadLetterMessageQueueGateway<MessageDomain>(_queueName
+        _sut = new RabbitMainMessageQueueGateway<MessageDomain>(_queueName
             , _connection
             , _mediator.Object
             , _logger.Object);
@@ -67,10 +67,10 @@ public class RabbitDeadLetterMessageQueueGatewayTests
             eventFired = true;
         };
         await _sut.DeQueue().ConfigureAwait(false);
-        System.Threading.Thread.Sleep(2000);
+        Thread.Sleep(2000);
         Assert.True(eventFired);
         _mediator.Verify(x =>
-            x.Publish(It.IsAny<ReSendSmsAndPublishNotification<MessageDomain>>()
+            x.Publish(It.IsAny<SendSmsAndPublishNotification<MessageDomain>>()
                 , It.IsAny<CancellationToken>()));
     }
 
@@ -91,7 +91,7 @@ public class RabbitDeadLetterMessageQueueGatewayTests
 
         //_sut.OnMessage += async (sender, domain) => throw new Exception("SampleException");
         await _sut.DeQueue().ConfigureAwait(false);
-        System.Threading.Thread.Sleep(2000);
+        Thread.Sleep(2000);
 
         // Assert
         _logger.Verify(x => x.Log(
@@ -118,7 +118,7 @@ public class RabbitDeadLetterMessageQueueGatewayTests
 
         //_sut.OnMessage += async (sender, domain) => throw new Exception("SampleException");
         await _sut.DeQueue().ConfigureAwait(false);
-        System.Threading.Thread.Sleep(2000);
+        Thread.Sleep(2000);
 
         // Assert
         _logger.Verify(x => x.Log(
@@ -130,7 +130,7 @@ public class RabbitDeadLetterMessageQueueGatewayTests
 
         _mediator.Verify(x =>
             x.Publish(It.IsAny<PromptNotification<CriticalException>>()
-                , It.IsAny<CancellationToken>())); 
+                , It.IsAny<CancellationToken>()));
     }
 
     [Fact]

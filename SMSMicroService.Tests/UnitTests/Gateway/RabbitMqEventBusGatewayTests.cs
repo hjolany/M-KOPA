@@ -5,7 +5,7 @@ using SMSMicroService.Gateway;
 using SMSMicroService.Helpers;
 using SMSMicroService.Infrastructures;
 
-namespace SMSMicroService.Tests.Gateway
+namespace SMSMicroService.Tests.UnitTests.Gateway
 {
     public class RabbitMqEventBusGatewayTests
     {
@@ -40,7 +40,7 @@ namespace SMSMicroService.Tests.Gateway
             //Assert
             Assert.True(true);
         }
-        
+
 
         [Fact]
         public async Task ThrowsCriticalExceptionWhenConnectionIsClosed()

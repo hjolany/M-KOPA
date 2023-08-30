@@ -5,7 +5,7 @@ using SMSMicroService.Entities.Domains;
 using SMSMicroService.Helpers;
 using System.Net;
 
-namespace SMSMicroService.Tests.Helpers
+namespace SMSMicroService.Tests.UnitTests.Helpers
 {
     public class CallApiTests
     {
@@ -18,18 +18,13 @@ namespace SMSMicroService.Tests.Helpers
             _httpMessageHandlerMock = new Mock<HttpMessageHandler>();
             _httpClientMock = new HttpClient(_httpMessageHandlerMock.Object);
             _logger = new Mock<ILogger<CallApi<MessageDomain>>>();
-        } 
+        }
 
         [Fact]
         public async Task GetThenReturns200()
         {
             // Arrange
-            var url = "https://example.com/api";
-            var data = new MessageDomain()
-            {
-                PhoneNumber = "123",
-                Content = "Sample"
-            }; 
+            var url = "https://example.com/api"; 
 
             var response = new HttpResponseMessage(HttpStatusCode.OK);
             _httpMessageHandlerMock.Protected()
@@ -39,7 +34,7 @@ namespace SMSMicroService.Tests.Helpers
             var _sut = new CallApi<MessageDomain>(_logger.Object, _httpClientMock);
 
             // Act
-            var result = await _sut.Get(url,data);
+            var result = await _sut.Get(url);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -50,14 +45,8 @@ namespace SMSMicroService.Tests.Helpers
         public async Task GetThenLogExceptionWhenExceptionFired()
         {
             // Arrange
-            var url = "https://example.com/api";
-            var data = new MessageDomain()
-            {
-                PhoneNumber = "123",
-                Content = "Sample"
-            }; 
+            var url = "https://example.com/api"; 
 
-            var response = new HttpResponseMessage(HttpStatusCode.OK);
             _httpMessageHandlerMock.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
                 .ThrowsAsync(new HttpRequestException("Sample Exception"));
@@ -65,12 +54,12 @@ namespace SMSMicroService.Tests.Helpers
             var _sut = new CallApi<MessageDomain>(_logger.Object, _httpClientMock);
 
             // Act
-            var result = await _sut.Get(url,data);
+            var result = await _sut.Get(url);
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
             Assert.False(result.IsSuccessStatusCode);
-            
+
             _logger.Verify(x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
@@ -83,14 +72,7 @@ namespace SMSMicroService.Tests.Helpers
         public async Task GetThenReturnsBadRequestWhenExceptionFired()
         {
             // Arrange
-            var url = "https://example.com/api";
-            var data = new MessageDomain()
-            {
-                PhoneNumber = "123",
-                Content = "Sample"
-            }; 
-
-            var response = new HttpResponseMessage(HttpStatusCode.OK);
+            var url = "https://example.com/api"; 
             _httpMessageHandlerMock.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
                 .ThrowsAsync(new HttpRequestException("Sample Exception"));
@@ -98,7 +80,7 @@ namespace SMSMicroService.Tests.Helpers
             var _sut = new CallApi<MessageDomain>(_logger.Object, _httpClientMock);
 
             // Act
-            var result = await _sut.Get(url,data);
+            var result = await _sut.Get(url);
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -141,8 +123,7 @@ namespace SMSMicroService.Tests.Helpers
                 PhoneNumber = "123",
                 Content = "Sample"
             };
-
-            var response = new HttpResponseMessage(HttpStatusCode.OK);
+             
             _httpMessageHandlerMock.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
                 .ThrowsAsync(new HttpRequestException("Sample Exception"));

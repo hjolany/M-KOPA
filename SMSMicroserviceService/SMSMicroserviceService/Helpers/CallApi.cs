@@ -16,11 +16,10 @@ public class CallApi<TRequest> : ICallApi<TRequest>
         _logger = logger;
         _httpClient = httpClient;
     }
-    public async Task<HttpResponseMessage> Get(string url, TRequest data)
+    public async Task<HttpResponseMessage> Get(string url)
     {
         try
         {
-            var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             return await _httpClient.GetAsync(url);
         }
         catch (HttpRequestException ex)
