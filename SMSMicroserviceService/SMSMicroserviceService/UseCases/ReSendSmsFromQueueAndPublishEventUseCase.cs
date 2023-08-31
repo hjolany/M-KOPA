@@ -6,9 +6,9 @@ namespace SMSMicroService.UseCases
 {
     public class ReSendSmsFromQueueAndPublishEventUseCase : IReSendSmsFromQueueAndPublishEventUseCase
     {
-        private readonly IRabbitDeadLetterMessageQueueGateway<MessageDomain> _queueGateway;
+        private readonly IRabbitDeadLetterMessageQueueGateway<MessageDomain?> _queueGateway;
 
-        public ReSendSmsFromQueueAndPublishEventUseCase(IRabbitDeadLetterMessageQueueGateway<MessageDomain> queueGateway)
+        public ReSendSmsFromQueueAndPublishEventUseCase(IRabbitDeadLetterMessageQueueGateway<MessageDomain?> queueGateway)
         {
             _queueGateway = queueGateway;
         }

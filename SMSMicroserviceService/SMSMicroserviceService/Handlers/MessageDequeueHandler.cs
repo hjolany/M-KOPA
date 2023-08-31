@@ -16,13 +16,13 @@ namespace SMSMicroService.Handlers
         private readonly IMessageGateway _messageGateway;
         private readonly IEventBusGateway<string> _eventBusGateway;
         private readonly ICallApi<MessageDomain> _callApi;
-        private readonly IRabbitDeadLetterMessageQueueGateway<MessageDomain> _rabbitDeadLetterMessageQueueGateway;
+        private readonly IRabbitDeadLetterMessageQueueGateway<MessageDomain?> _rabbitDeadLetterMessageQueueGateway;
         private readonly ILogger<MessageDequeueHandler> _logger;
 
         public MessageDequeueHandler(IMessageGateway messageGateway
             , IEventBusGateway<string> eventBusGateway
             , ICallApi<MessageDomain> callApi
-            , IRabbitDeadLetterMessageQueueGateway<MessageDomain> rabbitDeadLetterMessageQueueGateway
+            , IRabbitDeadLetterMessageQueueGateway<MessageDomain?> rabbitDeadLetterMessageQueueGateway
             , ILogger<MessageDequeueHandler> logger)
         {
             _messageGateway = messageGateway;

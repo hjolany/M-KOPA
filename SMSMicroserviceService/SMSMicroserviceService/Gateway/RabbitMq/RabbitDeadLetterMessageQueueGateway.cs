@@ -1,10 +1,12 @@
 ﻿using MediatR;
 using RabbitMQ.Client;
+using SMSMicroService.Entities.Domains;
+using SMSMicroService.Entities.Domains.Interfaces;
 using SMSMicroService.Gateway.Base;
 using SMSMicroService.Gateway.Interface;
 using SMSMicroService.Notifications;
 
-namespace SMSMicroService.Gateway
+namespace SMSMicroService.Gateway.RabbitMq
 {
     public class RabbitDeadLetterMessageQueueGateway<T> : BaseRabbitMessageQueueGateway<T>, IRabbitDeadLetterMessageQueueGateway<T>
     where T : class
@@ -18,10 +20,10 @@ namespace SMSMicroService.Gateway
             OnMessage += RabbitDeadLetterMessageQueueGateway_OnMessage;
         }
 
-        private void RabbitDeadLetterMessageQueueGateway_OnMessage(object? sender, Entities.Domains.RabbitMessageReceivedArgumentDomain<T> e)
+        private void RabbitDeadLetterMessageQueueGateway_OnMessage(object? sender, IMessageReceivedArgumentDomain<T> e)
         {
             Mediator.Publish(new ReSendSmsAndPublishNotification<T>(e.Data));
-            Channel.BasicAck(e.Delivery.DeliveryTag, multiple: false);
+            Channel.BasicAck(((RabbitMessageReceivedArgumentDomain<T>)e).Delivery.DeliveryTag, multiple: false);
         }
     }
 }

@@ -2,6 +2,7 @@
 using RabbitMQ.Client;
 using SMSMicroService.Entities.Domains;
 using SMSMicroService.Gateway;
+using SMSMicroService.Gateway.RabbitMq;
 using SMSMicroService.Helpers;
 using SMSMicroService.Infrastructures;
 

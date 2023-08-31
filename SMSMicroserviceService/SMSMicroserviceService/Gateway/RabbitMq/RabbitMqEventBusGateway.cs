@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text;
+using Microsoft.AspNetCore.Connections;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using SMSMicroService.Gateway.Interface;
-using System.Text;
-using Microsoft.AspNetCore.Connections;
 using SMSMicroService.Infrastructures;
 using SMSMicroService.Infrastructures.Extensions;
-using IConnectionFactory = RabbitMQ.Client.IConnectionFactory;
 
-namespace SMSMicroService.Gateway
+namespace SMSMicroService.Gateway.RabbitMq
 {
     public class RabbitMqEventBusGateway<T> : IEventBusGateway<T>
     {
@@ -40,14 +39,6 @@ namespace SMSMicroService.Gateway
             {
                 throw new CriticalException(ex.GetFullMessage());
             }
-        }
-
-        public async Task Count()
-        {
-            if (!_connection.IsOpen)
-                throw new ConnectionAbortedException();
-
-            //_channel.ExchangeBind();
-        }
+        } 
     }
 }

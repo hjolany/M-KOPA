@@ -11,10 +11,10 @@ namespace SMSMicroService.Controllers
     [Produces("application/json")]
     public class QueueApiController : ControllerBase
     {
-        private readonly IRabbitMainMessageQueueGateway<MessageDomain> _rabbitMainMessageQueueGateway;
+        private readonly IRabbitMainMessageQueueGateway<MessageDomain?> _rabbitMainMessageQueueGateway;
         private readonly IMessageGateway _messageGateway;
 
-        public QueueApiController(IRabbitMainMessageQueueGateway<MessageDomain> rabbitMainMessageQueueGateway,
+        public QueueApiController(IRabbitMainMessageQueueGateway<MessageDomain?> rabbitMainMessageQueueGateway,
             IMessageGateway messageGateway)
         {
             _rabbitMainMessageQueueGateway = rabbitMainMessageQueueGateway;

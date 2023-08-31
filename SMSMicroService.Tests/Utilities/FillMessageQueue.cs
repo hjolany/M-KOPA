@@ -5,6 +5,7 @@ using Moq;
 using RabbitMQ.Client;
 using SMSMicroService.Entities.Domains;
 using SMSMicroService.Gateway;
+using SMSMicroService.Gateway.RabbitMq;
 using SMSMicroService.Helpers;
 
 namespace SMSMicroService.Tests.Utilities
@@ -14,14 +15,15 @@ namespace SMSMicroService.Tests.Utilities
         private readonly Fixture _fixture;
         private readonly IConnection _connection;
         private readonly IConnectionFactory _factory;
-        private readonly RabbitMainMessageQueueGateway<MessageDomain> mainGateway;
-        private readonly string _queueName = AppConfig.Get("Queue:Main");
+        private readonly RabbitMainMessageQueueGateway<MessageDomain?> mainGateway;
         private readonly Mock<ILogger<RabbitMainMessageQueueGateway<MessageDomain>>> _mainLogger;
         private readonly Mock<IMediator> _mediator;
         private readonly string uri;
+        private string _queueName;
 
-        public FillMessageQueue()
+        public FillMessageQueue(string queueName)
         {
+            _queueName = queueName;
             uri = AppConfig.Get("Queue:Uri");
             _fixture = new Fixture();
             _factory = new ConnectionFactory()
@@ -31,7 +33,7 @@ namespace SMSMicroService.Tests.Utilities
             _connection = _factory.CreateConnection();
             _mainLogger = new Mock<ILogger<RabbitMainMessageQueueGateway<MessageDomain>>>();
             _mediator = new Mock<IMediator>();
-            mainGateway = new RabbitMainMessageQueueGateway<MessageDomain>(_queueName
+            mainGateway = new RabbitMainMessageQueueGateway<MessageDomain?>(_queueName
                 , _connection
                 , _mediator.Object
                 , _mainLogger.Object);

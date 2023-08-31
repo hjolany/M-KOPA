@@ -12,14 +12,23 @@ The application consists of the following components:
 - `Message Queue`: 
     - A message queue system that clients can subscribe to as publishers to publish SMS commands.
     - The main service subscribes to the message queue as a consumer and listens to the queue for new SMS commands.
-- `Main service`: A microservice, subscribers to the message queue as consumers and listens to the queue for new sms-sommand.
-- `3rd party API`: An external Api to send short messages to users.
-- `Dead letter Queue`: Second message queue to republish the failed messages into it for next try.
-- `Dead letter service`: A microservice, subscribers to the dead letter queue as consumers and listens to the queue for new failed messages.
-- `Event Publisher`: A service to publish SmsSent notifications into the global event bus.
-- `Event Queue`: A queue in a global bus that is notified by the event publisher.
-- `Logger`: A logger system to log all events and actions in the system in some levels as information, errors, and critical errors for maintenance purposes.
-- `Notifier`: An prompt system to notify the admins and support users by email or some other ways about the critical exceptions in the system like when message queues are not reachable.
+- `Main service`:
+    - The Main Service functions as a microservice that subscribes to the Message Queue as consumers. It actively listens to the queue for incoming SMS commands.
+- `3rd party API`: 
+    - An external API that is used to send SMS messages to users.
+- `Dead letter Queue`: 
+    - A second message queue that is used to republish failed messages for a retry attempt.
+    - The dead letter service subscribes to the dead letter queue as a consumer and listens to the queue for new failed messages.
+- `Dead letter service`:
+    - The Dead Letter Service operates as a microservice that subscribes to the Dead Letter Queue as consumers. It monitors the queue for new failed messages, facilitating necessary actions.
+- `Event Publisher`: 
+    - A service that publishes SMSSent notifications to the global event bus.
+- `Event Queue`:
+    - A queue in the global event bus that is notified by the event publisher.
+- `Logger`:
+    - A logger system that logs all events and actions in the system at different levels, such as information, errors, and critical errors. This is for maintenance purposes.
+- `Notifier`:
+    - A system that notifies admins and support users of critical exceptions in the system, such as when message queues are not reachable. This can be done via email or other means.
 
 ## Assumptions and Tradeoffs
 

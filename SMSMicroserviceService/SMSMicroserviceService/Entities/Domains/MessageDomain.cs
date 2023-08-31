@@ -1,5 +1,4 @@
-﻿using MediatR;
-using SMSMicroService.Entities.Domains.Interfaces;
+﻿using SMSMicroService.Entities.Domains.Interfaces;
 
 namespace SMSMicroService.Entities.Domains
 {

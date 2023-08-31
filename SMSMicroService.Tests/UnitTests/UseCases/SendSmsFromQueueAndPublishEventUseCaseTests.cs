@@ -10,12 +10,12 @@ namespace SMSMicroService.Tests.UnitTests.UseCases
     {
 
         private readonly ISendSmsFromQueueAndPublishEventUseCase _sut;
-        private readonly Mock<IRabbitMainMessageQueueGateway<MessageDomain>> _gateway;
+        private readonly Mock<IRabbitMainMessageQueueGateway<MessageDomain?>> _gateway;
 
 
         public SendSmsFromQueueAndPublishEventUseCaseTests()
         {
-            _gateway = new Mock<IRabbitMainMessageQueueGateway<MessageDomain>>();
+            _gateway = new Mock<IRabbitMainMessageQueueGateway<MessageDomain?>>();
             _sut = new SendSmsFromQueueAndPublishEventUseCase(_gateway.Object);
         }
 

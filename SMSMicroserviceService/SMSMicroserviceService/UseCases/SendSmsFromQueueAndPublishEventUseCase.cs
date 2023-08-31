@@ -6,9 +6,9 @@ namespace SMSMicroService.UseCases
 {
     public class SendSmsFromQueueAndPublishEventUseCase: ISendSmsFromQueueAndPublishEventUseCase
     {
-        private readonly IRabbitMainMessageQueueGateway<MessageDomain> _queueGateway;
+        private readonly IRabbitMainMessageQueueGateway<MessageDomain?> _queueGateway;
 
-        public SendSmsFromQueueAndPublishEventUseCase(IRabbitMainMessageQueueGateway<MessageDomain> queueGateway)
+        public SendSmsFromQueueAndPublishEventUseCase(IRabbitMainMessageQueueGateway<MessageDomain?> queueGateway)
         {
             _queueGateway = queueGateway;
         }

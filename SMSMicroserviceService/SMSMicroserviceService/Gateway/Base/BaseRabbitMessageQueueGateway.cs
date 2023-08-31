@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using SMSMicroService.Entities.Domains;
+using SMSMicroService.Entities.Domains.Interfaces;
 using SMSMicroService.Gateway.Interface;
 using SMSMicroService.Infrastructures;
 using SMSMicroService.Infrastructures.Extensions;
@@ -16,7 +17,7 @@ namespace SMSMicroService.Gateway.Base
     public abstract class BaseRabbitMessageQueueGateway<T> : IMessageQueueGateway<T>
         where T : class 
     {
-        public event EventHandler<RabbitMessageReceivedArgumentDomain<T>>? OnMessage;
+        public event EventHandler<IMessageReceivedArgumentDomain<T>>? OnMessage;
         private readonly string _queueName;
         protected readonly IMediator Mediator;
         protected readonly IModel Channel;
@@ -77,24 +78,10 @@ namespace SMSMicroService.Gateway.Base
                                                      $"{nameof(BaseRabbitMessageQueueGateway<T>.EnQueue)}: " +
                                                      $"The connection to the message queue is closed.");
 
-            /*var queueDeclareResponse = Channel.QueueDeclarePassive(_queueName);
-            return (int)queueDeclareResponse.MessageCount+(int)queueDeclareResponse.;*/
             return (int)Channel.ConsumerCount(_queueName);
-        }
+        } 
 
-        public async Task DeleteQueue()
-        {
-            if (!_connection.IsOpen)
-                throw new ConnectionAbortedException($"{nameof(BaseRabbitMessageQueueGateway<T>)}." +
-                                                     $"{nameof(BaseRabbitMessageQueueGateway<T>.EnQueue)}: " +
-                                                     $"The connection to the message queue is closed.");
-
-            /*var queueDeclareResponse = Channel.QueueDeclarePassive(_queueName);
-            return (int)queueDeclareResponse.MessageCount+(int)queueDeclareResponse.;*/
-            Channel.QueueDelete(_queueName, true, true);
-        }
-
-        public virtual async Task EnQueue(T message)
+        public virtual async Task EnQueue(T? message)
         {
             if (!_connection.IsOpen)
                 throw new ConnectionAbortedException($"{nameof(BaseRabbitMessageQueueGateway<T>)}." +

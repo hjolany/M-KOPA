@@ -10,6 +10,7 @@ using SMSMicroService.Helpers;
 using SMSMicroService.Helpers.Interfaces;
 using SMSMicroService.Services;
 using SMSMicroService.Controllers;
+using SMSMicroService.Gateway.RabbitMq;
 
 var builder = WebApplication.CreateBuilder(args);
 
