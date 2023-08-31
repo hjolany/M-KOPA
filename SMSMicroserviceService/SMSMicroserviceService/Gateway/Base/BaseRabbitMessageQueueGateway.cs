@@ -55,8 +55,6 @@ namespace SMSMicroService.Gateway.Base
                     if (objResult == null)
                         return;
                     OnMessage?.Invoke(this,new RabbitMessageReceivedArgumentDomain<T>(objResult,e));
-                    /*await _mediator.Publish(new SendSmsAndPublishNotification<T>(objResult));
-                    _channel.BasicAck(e.DeliveryTag, multiple: false);*/
                 }
                 catch (CriticalException cex)
                 {

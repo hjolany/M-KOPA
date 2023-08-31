@@ -6,6 +6,8 @@ using Moq;
 using RabbitMQ.Client;
 using SMSMicroService.Entities.Domains;
 using SMSMicroService.Entities.Domains.Interfaces;
+using SMSMicroService.Gateway.Base;
+using SMSMicroService.Gateway.Interface;
 using SMSMicroService.Gateway.RabbitMq;
 using SMSMicroService.Helpers;
 using SMSMicroService.Infrastructures;
@@ -21,9 +23,9 @@ public class RabbitDeadLetterMessageQueueGatewayTests1
     private readonly Fixture _fixture;
     private readonly IConnection _connection;
     private readonly IConnectionFactory _factory;
-    private readonly RabbitDeadLetterMessageQueueGateway<MessageDomain?> _sut;
+    private readonly IDeadLetterQueueGateway<MessageDomain> _sut;
     private readonly string _queueName = "RDQ-1";
-    private readonly Mock<ILogger<RabbitDeadLetterMessageQueueGateway<MessageDomain>>> _logger;
+    private readonly Mock<ILogger<BaseRabbitMessageQueueGateway<MessageDomain>>> _logger;
     private readonly Mock<IMediator> _mediator;
     private readonly string uri;
     public RabbitDeadLetterMessageQueueGatewayTests1()
@@ -36,7 +38,7 @@ public class RabbitDeadLetterMessageQueueGatewayTests1
         };
         _connection = _factory.CreateConnection();
         /*var channel = _connection.CreateModel();*/
-        _logger = new Mock<ILogger<RabbitDeadLetterMessageQueueGateway<MessageDomain>>>();
+        _logger = new Mock<ILogger<BaseRabbitMessageQueueGateway<MessageDomain>>>();
         _mediator = new Mock<IMediator>();
         _sut = new RabbitDeadLetterMessageQueueGateway<MessageDomain?>(_queueName
             , _connection

@@ -14,7 +14,7 @@ namespace SMSMicroService.Gateway.RabbitMq
         public RabbitDeadLetterMessageQueueGateway(string queueName
             , IConnection connection
             , IMediator mediator
-            , ILogger<IMessageQueueGateway<T>> logger)
+            , ILogger<BaseRabbitMessageQueueGateway<T>> logger)
             : base(queueName, connection, mediator, logger)
         {
             OnMessage += RabbitDeadLetterMessageQueueGateway_OnMessage;

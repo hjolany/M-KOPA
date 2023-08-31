@@ -7,6 +7,7 @@ using RabbitMQ.Client;
 using SMSMicroService.Entities.Domains;
 using SMSMicroService.Gateway;
 using SMSMicroService.Gateway.InMemory;
+using SMSMicroService.Gateway.Interface;
 using SMSMicroService.Gateway.RabbitMq;
 using SMSMicroService.Helpers;
 
@@ -15,8 +16,8 @@ namespace SMSMicroService.Tests.Utilities
     public class FillMessageQueue
     {
         private readonly Fixture _fixture;
-        private readonly RabbitMainMessageQueueGateway<MessageDomain?> _rabbitMqGateway;
-        private readonly InMemoryMessageQueueGateway<MessageDomain?> _inMemoryGateway;
+        private readonly IMessageQueueGateway<MessageDomain?> _rabbitMqGateway;
+        private readonly IMessageQueueGateway<MessageDomain?> _inMemoryGateway;
 
         public FillMessageQueue(string queueName)
         {
@@ -39,7 +40,7 @@ namespace SMSMicroService.Tests.Utilities
 
         public void FillMainQueue()
         {
-            var fillMq = new SMSMicroService.Controllers.QueueApiController(_rabbitMqGateway,_inMemoryGateway,new MessageGateway());
+            var fillMq = new SMSMicroService.Controllers.QueueApiController(/*_rabbitMqGateway,*/_inMemoryGateway,new MessageGateway());
             fillMq.Send(_fixture.Create<MessageDomain>());
             //rabbitMqGateway.EnQueue(_fixture.Create<MessageDomain>());
         }

@@ -1,14 +1,13 @@
 ﻿using MediatR;
 using SMSMicroService.Entities.Domains;
 using SMSMicroService.Factories;
-using SMSMicroService.Gateway;
 using SMSMicroService.Gateway.Interface;
 using SMSMicroService.Helpers;
 using SMSMicroService.Helpers.Interfaces;
 using SMSMicroService.Infrastructures;
 using SMSMicroService.Infrastructures.Enums;
 using SMSMicroService.Notifications;
-using SMSMicroService.UseCases;
+using SMSMicroService.UseCases.Interfaces;
 
 namespace SMSMicroService.Handlers
 {
@@ -17,13 +16,13 @@ namespace SMSMicroService.Handlers
         private readonly IMessageTableGateway _messageGateway;
         private readonly IEventBusGateway<string> _eventBusGateway;
         private readonly ICallApi<MessageDomain> _callApi;
-        private readonly DeadLetterEnQueueUseCase<MessageDomain> _deadLetterEnQueueUseCase;
+        private readonly IDeadLetterEnQueueUseCase<MessageDomain> _deadLetterEnQueueUseCase;
         private readonly ILogger<MessageDequeueHandler> _logger;
 
         public MessageDequeueHandler(IMessageTableGateway messageGateway
             , IEventBusGateway<string> eventBusGateway
             , ICallApi<MessageDomain> callApi
-            , DeadLetterEnQueueUseCase<MessageDomain> deadLetterEnQueueUseCase
+            , IDeadLetterEnQueueUseCase<MessageDomain> deadLetterEnQueueUseCase
             , ILogger<MessageDequeueHandler> logger)
         {
             _messageGateway = messageGateway;

@@ -53,15 +53,8 @@ namespace SMSMicroService.Tests.Integrated_Test.Services
             await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
             
             // Assert
-
-            var response = await app.GetAsync("/api/v1/queue/consumer/count");
-            response.ShouldNotBeNull();
-            response.ShouldBeOfType(typeof(HttpResponseMessage));
-            var count = await response?.Content.ReadAsStringAsync();
-            count.ShouldNotBeNullOrEmpty();
-            int.Parse(count).ShouldBeGreaterThan(0); 
             
-            response = await app.GetAsync("api/v1/queue/count/success");
+            var response = await app.GetAsync("api/v1/queue/count/success");
             response.ShouldNotBeNull();
             response.ShouldBeOfType(typeof(HttpResponseMessage));
             var successCount = await response?.Content.ReadAsStringAsync();

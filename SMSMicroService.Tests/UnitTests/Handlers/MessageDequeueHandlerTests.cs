@@ -12,6 +12,8 @@ using SMSMicroService.Helpers.Interfaces;
 using SMSMicroService.Infrastructures;
 using SMSMicroService.Infrastructures.Enums;
 using SMSMicroService.Notifications;
+using SMSMicroService.UseCases;
+using SMSMicroService.UseCases.Interfaces;
 
 namespace SMSMicroService.Tests.UnitTests.Handlers
 {
@@ -22,7 +24,7 @@ namespace SMSMicroService.Tests.UnitTests.Handlers
         private readonly Mock<IMessageTableGateway> messageGateway;
         private readonly Mock<IEventBusGateway<string>> eventBusGateway;
         private readonly Mock<ICallApi<MessageDomain>> callApi;
-        private readonly Mock<IRabbitDeadLetterMessageQueueGateway<MessageDomain?>> rabbitDeadLetterMessageQueueGateway;
+        private readonly Mock<IDeadLetterEnQueueUseCase<MessageDomain?>> _deadLetterEnQueueUseCase;
         private readonly Mock<ILogger<MessageDequeueHandler>> logger;
 
         public MessageDequeueHandlerTests()
@@ -30,13 +32,13 @@ namespace SMSMicroService.Tests.UnitTests.Handlers
             messageGateway = new Mock<IMessageTableGateway>();
             eventBusGateway = new Mock<IEventBusGateway<string>>();
             callApi = new Mock<ICallApi<MessageDomain>>();
-            rabbitDeadLetterMessageQueueGateway = new Mock<IRabbitDeadLetterMessageQueueGateway<MessageDomain?>>();
+            _deadLetterEnQueueUseCase = new Mock<IDeadLetterEnQueueUseCase<MessageDomain?>>();
             logger = new Mock<ILogger<MessageDequeueHandler>>();
 
             _sut = new MessageDequeueHandler(messageGateway.Object
                 , eventBusGateway.Object
                 , callApi.Object
-                , rabbitDeadLetterMessageQueueGateway.Object
+                , _deadLetterEnQueueUseCase.Object
                 , logger.Object);
         }
 
@@ -196,7 +198,8 @@ namespace SMSMicroService.Tests.UnitTests.Handlers
 
             // Assert
             eventBusGateway.Verify(x => x.Publish("SmsSent"), Times.Never);
-            rabbitDeadLetterMessageQueueGateway.Verify(x => x.EnQueue(message), Times.Once);
+            _deadLetterEnQueueUseCase.Verify(x => 
+                x.ExecuteAsync(message), Times.Once);
             logger.Verify(x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),

@@ -13,7 +13,7 @@ namespace SMSMicroService.Gateway.RabbitMq
         public RabbitMainMessageQueueGateway(string queueName
             , IConnection connection
             , IMediator mediator
-            , ILogger<IMessageQueueGateway<T>> logger)
+            , ILogger<BaseRabbitMessageQueueGateway<T>> logger)
             : base(queueName, connection, mediator, logger)
         {
             this.OnMessage += RabbitMainMessageQueueGateway_OnMessage;

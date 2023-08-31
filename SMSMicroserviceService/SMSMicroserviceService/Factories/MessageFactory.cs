@@ -6,7 +6,7 @@ namespace SMSMicroService.Factories
 {
     public static class MessageFactory
     {
-        public static MessageModel ToModel(this MessageDomain domain,EStatus status=EStatus.Draft,int retryCount = 2)
+        public static MessageModel ToModel(this MessageDomain domain,EStatus status=EStatus.Draft,int retryCount = 1)
         {
             return new MessageModel()
             {

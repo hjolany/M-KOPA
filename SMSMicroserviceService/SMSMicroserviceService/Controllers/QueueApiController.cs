@@ -11,16 +11,13 @@ namespace SMSMicroService.Controllers
     [Produces("application/json")]
     public class QueueApiController : ControllerBase
     {
-        private readonly IRabbitMainMessageQueueGateway<MessageDomain> _rabbitMainMessageQueueGateway;
-        private readonly IInMemoryMessageQueueGateway<MessageDomain> _inMemoryMessageQueueGateway;
+        private readonly IMessageQueueGateway<MessageDomain> _messageQueueGateway;
         private readonly IMessageTableGateway _messageGateway;
 
-        public QueueApiController(IRabbitMainMessageQueueGateway<MessageDomain> rabbitMainMessageQueueGateway,
-            IInMemoryMessageQueueGateway<MessageDomain> inMemoryMessageQueueGateway,
+        public QueueApiController(IMessageQueueGateway<MessageDomain> rabbitMainMessageQueueGateway,
             IMessageTableGateway messageGateway)
         {
-            _rabbitMainMessageQueueGateway = rabbitMainMessageQueueGateway;
-            _inMemoryMessageQueueGateway = inMemoryMessageQueueGateway;
+            _messageQueueGateway = rabbitMainMessageQueueGateway;
             _messageGateway = messageGateway;
         }
 
@@ -30,8 +27,7 @@ namespace SMSMicroService.Controllers
         {
             for (int i = 0; i < int.Parse(AppConfig.Get("Dummy:Count")); i++)
             {
-                //_rabbitMainMessageQueueGateway.EnQueue(domain);
-                _inMemoryMessageQueueGateway.EnQueue(domain);
+                _messageQueueGateway.EnQueue(domain);
             }
             return StatusCode((int)StatusCodes.Status201Created, domain);
         }
@@ -79,7 +75,7 @@ namespace SMSMicroService.Controllers
         [HttpGet("consumer/count")]
         public async Task<IActionResult> GetCount()
         {
-            var cnt = await _rabbitMainMessageQueueGateway.ConsumerCount().ConfigureAwait(false);
+            var cnt = await _messageQueueGateway.ConsumerCount().ConfigureAwait(false);
             return Ok(cnt);
         }
     }

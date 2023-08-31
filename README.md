@@ -57,6 +57,6 @@ Given more time, the following improvements could be made:
 
 ## Contact
 
-If you have any questions or suggestions, feel free to contact [your name] at [your email address].
+If you have any questions or suggestions, feel free to contact [hamid jolany] at [hjolany@gmail.com](http://hjolany.com)
 
 
