@@ -9,7 +9,9 @@ Using a third-party API for sending SMS messages can be risky due to the high re
 ## Solution Approach
 
 The application consists of the following components:
-- `Message Queue`: A message queue system, client subscribes as publisher to this queue and will publish sms-command.
+- `Message Queue`: 
+    - A message queue system that clients can subscribe to as publishers to publish SMS commands.
+    - The main service subscribes to the message queue as a consumer and listens to the queue for new SMS commands.
 - `Main service`: A microservice, subscribers to the message queue as consumers and listens to the queue for new sms-sommand.
 - `3rd party API`: An external Api to send short messages to users.
 - `Dead letter Queue`: Second message queue to republish the failed messages into it for next try.
