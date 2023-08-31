@@ -3,15 +3,16 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using SMSApi.Boundary.Requests;
+using SMSMicroService.Helpers;
 using SMSMicroService.Services;
 
 namespace SMSMicroService.Tests.Integrated_Test.Services
 {
-    public class MainQueueServiceIntegratedTests : IClassFixture<WebApplicationFactory<Program>>
+    public class ServiceIntegratedTests : IClassFixture<WebApplicationFactory<Program>>
     {
         private readonly WebApplicationFactory<Program> _factory;
 
-        public MainQueueServiceIntegratedTests(WebApplicationFactory<Program> factory)
+        public ServiceIntegratedTests(WebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }
@@ -20,6 +21,7 @@ namespace SMSMicroService.Tests.Integrated_Test.Services
         public async Task ServiceBeingExecuted()
         {
             // Arrange & Action
+            var messageCount = int.Parse(AppConfig.Get("Dummy:Count"));
             var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
@@ -48,19 +50,34 @@ namespace SMSMicroService.Tests.Integrated_Test.Services
             });
             
 
-            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
-
+            await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+            
             // Assert
 
             var response = await app.GetAsync("/api/v1/queue/consumer/count");
-
             response.ShouldNotBeNull();
             response.ShouldBeOfType(typeof(HttpResponseMessage));
-
             var count = await response?.Content.ReadAsStringAsync();
-
             count.ShouldNotBeNullOrEmpty();
             int.Parse(count).ShouldBeGreaterThan(0); 
+            
+            response = await app.GetAsync("api/v1/queue/count/success");
+            response.ShouldNotBeNull();
+            response.ShouldBeOfType(typeof(HttpResponseMessage));
+            var successCount = await response?.Content.ReadAsStringAsync();
+            successCount.ShouldNotBeNullOrEmpty();
+            
+            response = await app.GetAsync("api/v1/queue/count/failed");
+            response.ShouldNotBeNull();
+            response.ShouldBeOfType(typeof(HttpResponseMessage));
+            var failedCount = await response?.Content.ReadAsStringAsync();
+            failedCount.ShouldNotBeNullOrEmpty();
+
+            int.Parse(failedCount).ShouldBeLessThanOrEqualTo(messageCount);
+            int.Parse(successCount).ShouldBeLessThanOrEqualTo(messageCount);
+
+            (int.Parse(successCount)+ int.Parse(failedCount)).ShouldBeEquivalentTo(messageCount);
+
         }
     }
 }
