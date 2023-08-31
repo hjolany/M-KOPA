@@ -12,12 +12,15 @@ namespace SMSMicroService.Controllers
     public class QueueApiController : ControllerBase
     {
         private readonly IRabbitMainMessageQueueGateway<MessageDomain?> _rabbitMainMessageQueueGateway;
+        private readonly IInMemoryMessageQueueGateway<MessageDomain> _inMemoryMessageQueueGateway;
         private readonly IMessageGateway _messageGateway;
 
         public QueueApiController(IRabbitMainMessageQueueGateway<MessageDomain?> rabbitMainMessageQueueGateway,
+            IInMemoryMessageQueueGateway<MessageDomain> inMemoryMessageQueueGateway,
             IMessageGateway messageGateway)
         {
             _rabbitMainMessageQueueGateway = rabbitMainMessageQueueGateway;
+            _inMemoryMessageQueueGateway = inMemoryMessageQueueGateway;
             _messageGateway = messageGateway;
         }
 
@@ -27,7 +30,8 @@ namespace SMSMicroService.Controllers
         {
             for (int i = 0; i < int.Parse(AppConfig.Get("Dummy:Count")); i++)
             {
-                _rabbitMainMessageQueueGateway.EnQueue(domain);
+                //_rabbitMainMessageQueueGateway.EnQueue(domain);
+                _inMemoryMessageQueueGateway.EnQueue(domain);
             }
             return StatusCode((int)StatusCodes.Status201Created, domain);
         }

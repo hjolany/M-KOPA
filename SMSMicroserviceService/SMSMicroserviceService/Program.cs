@@ -11,6 +11,7 @@ using SMSMicroService.Helpers.Interfaces;
 using SMSMicroService.Services;
 using SMSMicroService.Controllers;
 using SMSMicroService.Gateway.RabbitMq;
+using SMSMicroService.Gateway.InMemory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,8 @@ builder.Services.AddSingleton<ICallApi<MessageDomain>, CallApi<MessageDomain>>()
 builder.Services.AddSingleton<IMessageGateway, MessageGateway>();
 builder.Services.AddSingleton<ISendSmsFromQueueAndPublishEventUseCase, SendSmsFromQueueAndPublishEventUseCase>();
 builder.Services.AddSingleton<IReSendSmsFromQueueAndPublishEventUseCase, ReSendSmsFromQueueAndPublishEventUseCase>();
+
+builder.Services.AddSingleton<IInMemoryMessageQueueGateway<MessageDomain>, InMemoryMessageQueueGateway<MessageDomain>>();
 
 builder.Services.AddSingleton<IRabbitMainMessageQueueGateway<MessageDomain>>(provider =>
 {

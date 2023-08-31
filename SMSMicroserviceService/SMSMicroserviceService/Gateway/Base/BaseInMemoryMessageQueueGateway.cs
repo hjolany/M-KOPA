@@ -1,31 +1,45 @@
 ﻿using System.Collections.Concurrent;
-using RabbitMQ.Client.Events;
+using MediatR;
 using SMSMicroService.Entities.Domains;
 using SMSMicroService.Entities.Domains.Interfaces;
 using SMSMicroService.Gateway.Interface;
+using SMSMicroService.Infrastructures.Queue.InMemory;
 
 namespace SMSMicroService.Gateway.Base
 {
-    public class BaseInMemoryMessageQueueGateway<T>: IMessageQueueGateway<T>
+    public abstract class BaseInMemoryMessageQueueGateway<T>: IMessageQueueGateway<T>
     where T : class 
     {
-        private readonly ConcurrentQueue<T?> _queue;
-        public BaseInMemoryMessageQueueGateway()
+
+        InMemoryQueue<T> queue;
+        private readonly ILogger<BaseInMemoryMessageQueueGateway<T>> _logger;
+        protected readonly IMediator Mediator;
+
+        protected BaseInMemoryMessageQueueGateway(ILogger<BaseInMemoryMessageQueueGateway<T>> logger, IMediator mediator)
         {
-            _queue = new ConcurrentQueue<T?>();
+            _logger = logger;
+            Mediator = mediator;
+            queue = new InMemoryQueue<T>();
         }
 
         public event EventHandler<IMessageReceivedArgumentDomain<T>>? OnMessage;
 
         public async Task EnQueue(T? message)
         {
-            _queue.Enqueue(message);
+            queue.Enqueue(message);
         }
 
         public async Task DeQueue()
         {
-            _queue.TryDequeue(out var message);
-            OnMessage?.Invoke(this,new InMemoryMessageReceivedArgumentDomain<T>(message));
+            //var tcs = new TaskCompletionSource();
+
+            var message = queue.Dequeue();
+            queue.Received += (object? sender, InMemoryMessageEventArgs<T> e) =>
+            {
+                OnMessage?.Invoke(this,new InMemoryMessageReceivedArgumentDomain<T>(e.Message));
+            };
+
+            //await tcs.Task;
         }
 
         public Task<int> ConsumerCount()
@@ -36,6 +50,6 @@ namespace SMSMicroService.Gateway.Base
         public Task DeleteQueue()
         {
             throw new NotImplementedException();
-        }
+        } 
     }
 }

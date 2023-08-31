@@ -19,10 +19,10 @@ namespace SMSMicroService.Gateway.Base
     {
         public event EventHandler<IMessageReceivedArgumentDomain<T>>? OnMessage;
         private readonly string _queueName;
+        private readonly ILogger<BaseRabbitMessageQueueGateway<T>> _logger;
         protected readonly IMediator Mediator;
         protected readonly IModel Channel;
         private readonly IConnection _connection;
-        private readonly ILogger<BaseRabbitMessageQueueGateway<T>> _logger;
 
         protected BaseRabbitMessageQueueGateway(string queueName
             , IConnection connection

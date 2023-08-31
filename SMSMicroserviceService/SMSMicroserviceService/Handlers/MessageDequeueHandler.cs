@@ -35,25 +35,28 @@ namespace SMSMicroService.Handlers
         {
             try
             {
-                var entity = await _messageGateway.Add(notification.Data.ToModel(retryCount: 1)).ConfigureAwait(false);
-
-                var response = await
-                    _callApi.Post(AppConfig.Get("Settings:SmsAPiUrl1").ToString(), notification.Data).ConfigureAwait(false);
-
-                if (response?.IsSuccessStatusCode ?? false)
+                if (notification?.Data != null)
                 {
-                    entity.Status = EStatus.Success;
-                    await _eventBusGateway.Publish("SmsSent").ConfigureAwait(false);
+                    var entity = await _messageGateway.Add(notification.Data.ToModel(retryCount: 1)).ConfigureAwait(false);
+
+                    var response = await
+                        _callApi.Post(AppConfig.Get("Settings:SmsAPiUrl1").ToString(), notification.Data).ConfigureAwait(false);
+
+                    if (response?.IsSuccessStatusCode ?? false)
+                    {
+                        entity.Status = EStatus.Success;
+                        await _eventBusGateway.Publish("SmsSent").ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await _rabbitDeadLetterMessageQueueGateway.EnQueue(notification.Data).ConfigureAwait(false);
+                        entity.Status = EStatus.Failed;
+                        entity.Exception = await response?.Content.ReadAsStringAsync();
+                        _logger.LogError($"External API Error: {entity.Exception}");
+                    }
+                    await _messageGateway.Update(entity).ConfigureAwait(false);
+                    _logger.LogInformation($"{DateTime.Now:HH:mm:ss}\t{notification.Data}");
                 }
-                else
-                {
-                    await _rabbitDeadLetterMessageQueueGateway.EnQueue(notification.Data).ConfigureAwait(false);
-                    entity.Status = EStatus.Failed;
-                    entity.Exception = await response?.Content.ReadAsStringAsync();
-                    _logger.LogError($"External API Error: {entity.Exception}");
-                }
-                await _messageGateway.Update(entity).ConfigureAwait(false);
-                _logger.LogInformation($"{DateTime.Now:HH:mm:ss}\t{notification.Data}");
             }
             catch (CriticalException ex)
             {
