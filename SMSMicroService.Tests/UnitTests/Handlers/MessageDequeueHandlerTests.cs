@@ -19,7 +19,7 @@ namespace SMSMicroService.Tests.UnitTests.Handlers
     {
         private readonly Fixture _fixture = new();
         private readonly MessageDequeueHandler _sut;
-        private readonly Mock<IMessageGateway> messageGateway;
+        private readonly Mock<IMessageTableGateway> messageGateway;
         private readonly Mock<IEventBusGateway<string>> eventBusGateway;
         private readonly Mock<ICallApi<MessageDomain>> callApi;
         private readonly Mock<IRabbitDeadLetterMessageQueueGateway<MessageDomain?>> rabbitDeadLetterMessageQueueGateway;
@@ -27,7 +27,7 @@ namespace SMSMicroService.Tests.UnitTests.Handlers
 
         public MessageDequeueHandlerTests()
         {
-            messageGateway = new Mock<IMessageGateway>();
+            messageGateway = new Mock<IMessageTableGateway>();
             eventBusGateway = new Mock<IEventBusGateway<string>>();
             callApi = new Mock<ICallApi<MessageDomain>>();
             rabbitDeadLetterMessageQueueGateway = new Mock<IRabbitDeadLetterMessageQueueGateway<MessageDomain?>>();

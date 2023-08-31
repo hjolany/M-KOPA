@@ -6,19 +6,15 @@ namespace SMSMicroService.UseCases
 {
     public class SendSmsFromQueueAndPublishEventUseCase: ISendSmsFromQueueAndPublishEventUseCase
     {
-        private readonly IRabbitMainMessageQueueGateway<MessageDomain?> _queueGateway;
-        private readonly IInMemoryMessageQueueGateway<MessageDomain> _inMemoryMessageQueueGateway;
+        private readonly IMessageQueueGateway<MessageDomain> _messageQueueGateway;
 
-        public SendSmsFromQueueAndPublishEventUseCase(IRabbitMainMessageQueueGateway<MessageDomain?> queueGateway,
-            IInMemoryMessageQueueGateway<MessageDomain> inMemoryMessageQueueGateway)
+        public SendSmsFromQueueAndPublishEventUseCase(IMessageQueueGateway<MessageDomain> messageQueueGateway)
         {
-            _queueGateway = queueGateway;
-            _inMemoryMessageQueueGateway = inMemoryMessageQueueGateway;
+            _messageQueueGateway = messageQueueGateway;
         }
         public async Task ExecuteAsync()
         {
-            /*await _queueGateway.DeQueue().ConfigureAwait(false);*/
-            await _inMemoryMessageQueueGateway.DeQueue().ConfigureAwait(false);
+            await _messageQueueGateway.DeQueue().ConfigureAwait(false);
         }
     }
 }

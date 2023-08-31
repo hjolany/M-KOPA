@@ -35,13 +35,13 @@ builder.Services.AddSingleton<QueueApiController, QueueApiController>();
 
 builder.Services.AddSingleton<IEmailHelper, EmailHelper>();
 builder.Services.AddSingleton<ICallApi<MessageDomain>, CallApi<MessageDomain>>();
-builder.Services.AddSingleton<IMessageGateway, MessageGateway>();
+builder.Services.AddSingleton<IMessageTableGateway, MessageGateway>();
+
 builder.Services.AddSingleton<ISendSmsFromQueueAndPublishEventUseCase, SendSmsFromQueueAndPublishEventUseCase>();
 builder.Services.AddSingleton<IReSendSmsFromQueueAndPublishEventUseCase, ReSendSmsFromQueueAndPublishEventUseCase>();
+builder.Services.AddSingleton<IDeadLetterEnQueueUseCase<MessageDomain>, DeadLetterEnQueueUseCase<MessageDomain>>();
 
-builder.Services.AddSingleton<IInMemoryMessageQueueGateway<MessageDomain>, InMemoryMessageQueueGateway<MessageDomain>>();
-
-builder.Services.AddSingleton<IRabbitMainMessageQueueGateway<MessageDomain>>(provider =>
+builder.Services.AddSingleton<IMessageQueueGateway<MessageDomain>>(provider =>
 {
     var uri = AppConfig.Get("Queue:Uri");
     var queueName = AppConfig.Get("Queue:Main");
@@ -52,10 +52,10 @@ builder.Services.AddSingleton<IRabbitMainMessageQueueGateway<MessageDomain>>(pro
     var connection = factory.CreateConnection();
     var mediator = provider.GetRequiredService<IMediator>();
     var logger = provider.GetRequiredService<ILogger<RabbitMainMessageQueueGateway<MessageDomain>>>();
-    return new RabbitMainMessageQueueGateway<MessageDomain>(queueName, connection, mediator,logger);
+    return new RabbitMainMessageQueueGateway<MessageDomain>(queueName, connection, mediator, logger);
 });
 
-builder.Services.AddSingleton<IRabbitDeadLetterMessageQueueGateway<MessageDomain>>(provider =>
+builder.Services.AddSingleton<IDeadLetterQueueGateway<MessageDomain>>(provider =>
 {
     var uri = AppConfig.Get("Queue:Uri");
     var queueName = AppConfig.Get("Queue:DeadLetter");
@@ -80,7 +80,11 @@ builder.Services.AddSingleton<IEventBusGateway<string>>(provider =>
     };
     var connection = factory.CreateConnection();
     return new RabbitMqEventBusGateway<string>(exchangeName, routingKey, connection);
-}); 
+});
+
+/*builder.Services.AddSingleton<IMessageQueueGateway<MessageDomain>, InMemoryMessageQueueGateway<MessageDomain>>();
+builder.Services.AddSingleton<IDeadLetterQueueGateway<MessageDomain>, InMemoryDeadLetterQueueGateway<MessageDomain>>();
+builder.Services.AddSingleton<IEventBusGateway<string>, InMemoryEventBusGateway<string>>();*/
 
 builder.Services.AddHostedService<MainQueueService>();
 builder.Services.AddHostedService<DeadQueueService>();

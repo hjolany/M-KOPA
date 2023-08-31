@@ -12,12 +12,12 @@ namespace SMSMicroService.Handlers
 {
     public class DeadLetterDequeueHandler : INotificationHandler<ReSendSmsAndPublishNotification<MessageDomain>>
     {
-        private readonly IMessageGateway _messageGateway;
+        private readonly IMessageTableGateway _messageGateway;
         private readonly IEventBusGateway<string> _eventBusGateway;
         private readonly ICallApi<MessageDomain> _callApi;
         private readonly ILogger<DeadLetterDequeueHandler> _logger;
 
-        public DeadLetterDequeueHandler(IMessageGateway messageGateway
+        public DeadLetterDequeueHandler(IMessageTableGateway messageGateway
             , IEventBusGateway<string> eventBusGateway
             , ICallApi<MessageDomain> callApi
             , ILogger<DeadLetterDequeueHandler> logger)

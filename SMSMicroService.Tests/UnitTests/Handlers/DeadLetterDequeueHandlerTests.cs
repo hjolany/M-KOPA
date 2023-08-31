@@ -17,14 +17,14 @@ namespace SMSMicroService.Tests.UnitTests.Handlers
     {
         private readonly Fixture _fixture = new();
         private readonly DeadLetterDequeueHandler _sut;
-        private readonly Mock<IMessageGateway> _messageGateway;
+        private readonly Mock<IMessageTableGateway> _messageGateway;
         private readonly Mock<IEventBusGateway<string>> _eventBusGateway;
         private readonly Mock<ICallApi<MessageDomain>> _callApi;
         private readonly Mock<ILogger<DeadLetterDequeueHandler>> _logger;
 
         public DeadLetterDequeueHandlerTests()
         {
-            _messageGateway = new Mock<IMessageGateway>();
+            _messageGateway = new Mock<IMessageTableGateway>();
             _eventBusGateway = new Mock<IEventBusGateway<string>>();
             _callApi = new Mock<ICallApi<MessageDomain>>();
             _logger = new Mock<ILogger<DeadLetterDequeueHandler>>();

@@ -5,10 +5,10 @@ using SMSMicroService.Notifications;
 
 namespace SMSMicroService.Gateway.InMemory
 {
-    public class InMemoryMessageQueueGateway<T>: BaseInMemoryMessageQueueGateway<T>, IInMemoryMessageQueueGateway<T>
+    public class InMemoryDeadLetterQueueGateway<T>: BaseInMemoryMessageQueueGateway<T>, IInMemoryDeadLetterQueueGateway<T>
         where T : class
     {
-        public InMemoryMessageQueueGateway(ILogger<IInMemoryMessageQueueGateway<T>> logger
+        public InMemoryDeadLetterQueueGateway(ILogger<IInMemoryMessageQueueGateway<T>> logger
             , IMediator mediator) : base(logger, mediator)
         {
             OnMessage += InMemoryMessageQueueGateway_OnMessage;

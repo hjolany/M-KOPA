@@ -2,7 +2,7 @@
 
 namespace SMSMicroService.Gateway.Interface
 {
-    public interface IMessageGateway:IBaseGateway<MessageModel>
+    public interface IMessageTableGateway:IBaseGateway<MessageModel>
     {
     }
 }

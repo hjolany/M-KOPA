@@ -8,27 +8,28 @@ using SMSMicroService.Helpers.Interfaces;
 using SMSMicroService.Infrastructures;
 using SMSMicroService.Infrastructures.Enums;
 using SMSMicroService.Notifications;
+using SMSMicroService.UseCases;
 
 namespace SMSMicroService.Handlers
 {
     public class MessageDequeueHandler : INotificationHandler<SendSmsAndPublishNotification<MessageDomain>>
     {
-        private readonly IMessageGateway _messageGateway;
+        private readonly IMessageTableGateway _messageGateway;
         private readonly IEventBusGateway<string> _eventBusGateway;
         private readonly ICallApi<MessageDomain> _callApi;
-        private readonly IRabbitDeadLetterMessageQueueGateway<MessageDomain?> _rabbitDeadLetterMessageQueueGateway;
+        private readonly DeadLetterEnQueueUseCase<MessageDomain> _deadLetterEnQueueUseCase;
         private readonly ILogger<MessageDequeueHandler> _logger;
 
-        public MessageDequeueHandler(IMessageGateway messageGateway
+        public MessageDequeueHandler(IMessageTableGateway messageGateway
             , IEventBusGateway<string> eventBusGateway
             , ICallApi<MessageDomain> callApi
-            , IRabbitDeadLetterMessageQueueGateway<MessageDomain?> rabbitDeadLetterMessageQueueGateway
+            , DeadLetterEnQueueUseCase<MessageDomain> deadLetterEnQueueUseCase
             , ILogger<MessageDequeueHandler> logger)
         {
             _messageGateway = messageGateway;
             _eventBusGateway = eventBusGateway;
             _callApi = callApi;
-            _rabbitDeadLetterMessageQueueGateway = rabbitDeadLetterMessageQueueGateway;
+            _deadLetterEnQueueUseCase = deadLetterEnQueueUseCase;
             _logger = logger;
         }
         public async Task Handle(SendSmsAndPublishNotification<MessageDomain> notification, CancellationToken cancellationToken)
@@ -49,7 +50,7 @@ namespace SMSMicroService.Handlers
                     }
                     else
                     {
-                        await _rabbitDeadLetterMessageQueueGateway.EnQueue(notification.Data).ConfigureAwait(false);
+                        await _deadLetterEnQueueUseCase.ExecuteAsync(notification.Data).ConfigureAwait(false);
                         entity.Status = EStatus.Failed;
                         entity.Exception = await response?.Content.ReadAsStringAsync();
                         _logger.LogError($"External API Error: {entity.Exception}");

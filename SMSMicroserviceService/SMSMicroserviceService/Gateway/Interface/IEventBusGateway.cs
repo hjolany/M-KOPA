@@ -2,6 +2,6 @@
 {
     public interface IEventBusGateway<in T>
     {
-        public Task Publish(T data);
+        public Task Publish(T @event);
     }
 }

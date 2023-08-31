@@ -1,6 +1,6 @@
 ﻿namespace SMSMicroService.Gateway.Interface
 {
-    public interface IRabbitDeadLetterMessageQueueGateway<T> :IMessageQueueGateway<T> where T : class
+    public interface IRabbitDeadLetterMessageQueueGateway<T> : IDeadLetterQueueGateway<T> where T : class
     {
     }
 }

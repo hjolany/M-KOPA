@@ -12,10 +12,10 @@ namespace SMSMicroService.Gateway.Base
     {
 
         InMemoryQueue<T> queue;
-        private readonly ILogger<BaseInMemoryMessageQueueGateway<T>> _logger;
+        private readonly ILogger<IInMemoryMessageQueueGateway<T>> _logger;
         protected readonly IMediator Mediator;
 
-        protected BaseInMemoryMessageQueueGateway(ILogger<BaseInMemoryMessageQueueGateway<T>> logger, IMediator mediator)
+        protected BaseInMemoryMessageQueueGateway(ILogger<IInMemoryMessageQueueGateway<T>> logger, IMediator mediator)
         {
             _logger = logger;
             Mediator = mediator;

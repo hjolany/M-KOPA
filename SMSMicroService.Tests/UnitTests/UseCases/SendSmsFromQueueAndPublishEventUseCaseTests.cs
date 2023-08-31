@@ -1,5 +1,6 @@
 ﻿using Moq;
 using SMSMicroService.Entities.Domains;
+using SMSMicroService.Gateway.InMemory;
 using SMSMicroService.Gateway.Interface;
 using SMSMicroService.UseCases;
 using SMSMicroService.UseCases.Interfaces;
@@ -10,12 +11,12 @@ namespace SMSMicroService.Tests.UnitTests.UseCases
     {
 
         private readonly ISendSmsFromQueueAndPublishEventUseCase _sut;
-        private readonly Mock<IRabbitMainMessageQueueGateway<MessageDomain?>> _gateway;
+        private readonly Mock<InMemoryMessageQueueGateway<MessageDomain?>> _gateway;
 
 
         public SendSmsFromQueueAndPublishEventUseCaseTests()
         {
-            _gateway = new Mock<IRabbitMainMessageQueueGateway<MessageDomain?>>();
+            _gateway = new Mock<InMemoryMessageQueueGateway<MessageDomain?>>();
             _sut = new SendSmsFromQueueAndPublishEventUseCase(_gateway.Object);
         }
 

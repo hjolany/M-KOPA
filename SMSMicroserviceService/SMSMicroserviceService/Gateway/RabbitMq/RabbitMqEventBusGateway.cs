@@ -14,6 +14,12 @@ namespace SMSMicroService.Gateway.RabbitMq
         private readonly string _routingKey;
         private readonly IConnection _connection;
         private readonly IModel _channel;
+
+        public RabbitMqEventBusGateway()
+        {
+            
+        }
+
         public RabbitMqEventBusGateway(string exchangeName, string routingKey,
             IConnection connection)
         {
