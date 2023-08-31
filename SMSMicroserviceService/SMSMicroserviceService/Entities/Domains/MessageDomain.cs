@@ -6,6 +6,7 @@ namespace SMSMicroService.Entities.Domains
     {
         public string PhoneNumber { get; set; }
         public string Content { get; set; }
+        public DateTime SendDate { get; set; } = DateTime.Now;
         public override string ToString()
         {
             return $"{PhoneNumber}=>\t{Content}";
