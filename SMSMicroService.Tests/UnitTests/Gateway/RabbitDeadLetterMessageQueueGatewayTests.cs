@@ -50,7 +50,8 @@ public class RabbitDeadLetterMessageQueueGatewayTests1
     public async Task LogExceptionWhenEventThrowsException()
     {
         // Arrange 
-        new FillMessageQueue(_queueName).FillMainQueue();
+        new RabbitMessageQueueHelper(_queueName).FillMainQueue();
+
         var mockEventHandler = new Mock<EventHandler<IMessageReceivedArgumentDomain<MessageDomain>>>();
         mockEventHandler.Setup(h =>
                 h.Invoke(It.IsAny<object>(), It.IsAny<IMessageReceivedArgumentDomain<MessageDomain>>()))
@@ -155,7 +156,7 @@ public class RabbitDeadLetterMessageQueueGatewayTests2
     {
         // Arrange
         bool eventFired = false;
-        new FillMessageQueue(_queueName).FillMainQueue();
+        new RabbitMessageQueueHelper(_queueName).FillMainQueue();
 
         // Act & Assert
         _sut.OnMessage += async (sender, domain) =>
@@ -207,7 +208,8 @@ public class RabbitDeadLetterMessageQueueGatewayTests3
     public async Task LogCriticalExceptionAndPublishNotificationWhenEventThrowsCriticalException()
     {
         // Arrange 
-        new FillMessageQueue(_queueName).FillMainQueue();
+        new RabbitMessageQueueHelper(_queueName).FillMainQueue();
+
         var mockEventHandler = new Mock<EventHandler<IMessageReceivedArgumentDomain<MessageDomain>>>();
         mockEventHandler.Setup(h =>
                 h.Invoke(It.IsAny<object>(), It.IsAny<IMessageReceivedArgumentDomain<MessageDomain>>()))

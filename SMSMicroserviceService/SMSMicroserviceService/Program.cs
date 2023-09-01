@@ -41,6 +41,7 @@ builder.Services.AddSingleton<ISendSmsFromQueueAndPublishEventUseCase, SendSmsFr
 builder.Services.AddSingleton<IReSendSmsFromQueueAndPublishEventUseCase, ReSendSmsFromQueueAndPublishEventUseCase>();
 builder.Services.AddSingleton<IDeadLetterEnQueueUseCase<MessageDomain>, DeadLetterEnQueueUseCase<MessageDomain>>();
 
+#region RabbitGateways
 /*builder.Services.AddSingleton<IMessageQueueGateway<MessageDomain>>(provider =>
 {
     var uri = AppConfig.Get("Queue:Uri");
@@ -81,10 +82,13 @@ builder.Services.AddSingleton<IEventBusGateway<string>>(provider =>
     var connection = factory.CreateConnection();
     return new RabbitMqEventBusGateway<string>(exchangeName, routingKey, connection);
 });*/
+#endregion
 
-/*builder.Services.AddSingleton<IMessageQueueGateway<MessageDomain>, InMemoryMessageQueueGateway<MessageDomain>>();
+#region InMemoryGateways
+builder.Services.AddSingleton<IMessageQueueGateway<MessageDomain>, InMemoryMessageQueueGateway<MessageDomain>>();
 builder.Services.AddSingleton<IDeadLetterQueueGateway<MessageDomain>, InMemoryDeadLetterQueueGateway<MessageDomain>>();
-builder.Services.AddSingleton<IEventBusGateway<string>, InMemoryEventBusGateway<string>>();*/
+builder.Services.AddSingleton<IEventBusGateway<string>, InMemoryEventBusGateway<string>>();
+#endregion
 
 builder.Services.AddHostedService<MainQueueService>();
 builder.Services.AddHostedService<DeadQueueService>();

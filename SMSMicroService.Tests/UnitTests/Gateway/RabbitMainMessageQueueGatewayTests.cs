@@ -7,6 +7,8 @@ using RabbitMQ.Client;
 using SMSMicroService.Entities.Domains;
 using SMSMicroService.Entities.Domains.Interfaces;
 using SMSMicroService.Gateway;
+using SMSMicroService.Gateway.Base;
+using SMSMicroService.Gateway.Interface;
 using SMSMicroService.Gateway.RabbitMq;
 using SMSMicroService.Helpers;
 using SMSMicroService.Infrastructures;
@@ -22,9 +24,9 @@ public class RabbitMainMessageQueueGatewayTests1
     private readonly Fixture _fixture;
     private readonly IConnection _connection;
     private readonly IConnectionFactory _factory;
-    private readonly RabbitMainMessageQueueGateway<MessageDomain?> _sut;
+    private readonly IMessageQueueGateway<MessageDomain?> _sut;
     private readonly string _queueName = "RMQ-1";
-    private readonly Mock<ILogger<RabbitMainMessageQueueGateway<MessageDomain>>> _logger;
+    private readonly Mock<ILogger<BaseRabbitMessageQueueGateway<MessageDomain>>> _logger;
     private readonly Mock<IMediator> _mediator;
     private readonly string uri;
     public RabbitMainMessageQueueGatewayTests1()
@@ -37,7 +39,7 @@ public class RabbitMainMessageQueueGatewayTests1
         };
         _connection = _factory.CreateConnection();
         /*var channel = _connection.CreateModel();*/
-        _logger = new Mock<ILogger<RabbitMainMessageQueueGateway<MessageDomain>>>();
+        _logger = new Mock<ILogger<BaseRabbitMessageQueueGateway<MessageDomain>>>();
         _mediator = new Mock<IMediator>();
         _sut = new RabbitMainMessageQueueGateway<MessageDomain?>(_queueName
             , _connection
@@ -61,7 +63,7 @@ public class RabbitMainMessageQueueGatewayTests1
     {
         // Arrange
         bool eventFired = false;
-        new FillMessageQueue(_queueName).FillMainQueue();
+        new RabbitMessageQueueHelper(_queueName).FillMainQueue();
 
         // Act & Assert
         _sut.OnMessage += async (sender, domain) =>
@@ -146,7 +148,8 @@ public class RabbitMainMessageQueueGatewayTests2
     public async Task LogExceptionWhenEventThrowsException()
     {
         // Arrange 
-        new FillMessageQueue(_queueName).FillMainQueue();
+        new RabbitMessageQueueHelper(_queueName).FillMainQueue();
+
         var mockEventHandler = new Mock<EventHandler<IMessageReceivedArgumentDomain<MessageDomain>>>();
         mockEventHandler.Setup(h =>
                 h.Invoke(It.IsAny<object>(), It.IsAny<IMessageReceivedArgumentDomain<MessageDomain>>()))
@@ -206,7 +209,8 @@ public class RabbitMainMessageQueueGatewayTests3
     public async Task LogCriticalExceptionAndPublishNotificationWhenEventThrowsCriticalException()
     {
         // Arrange 
-        new FillMessageQueue(_queueName).FillMainQueue();
+        new RabbitMessageQueueHelper(_queueName).FillMainQueue();
+
         var mockEventHandler = new Mock<EventHandler<IMessageReceivedArgumentDomain<MessageDomain>>>();
         mockEventHandler.Setup(h =>
                 h.Invoke(It.IsAny<object>(), It.IsAny<IMessageReceivedArgumentDomain<MessageDomain>>()))
